@@ -20,6 +20,7 @@ namespace OOP {
             Dog dog1 = new Dog("Raf", 12, Gender.male);
             dog1.PrintValues();
             dog1.Sleep();
+            dog1.Speak();
             
             Animal.Print();
 
