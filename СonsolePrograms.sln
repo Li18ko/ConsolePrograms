@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "СonsolePrograms", "Сonsol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOP", "OOP\OOP.csproj", "{B6E0EAE6-8EBB-4B30-9EAD-4C129E54BB4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collections", "Collections\Collections.csproj", "{D319A1A5-6EB2-4FA1-91F3-548CE3B5C4E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{B6E0EAE6-8EBB-4B30-9EAD-4C129E54BB4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6E0EAE6-8EBB-4B30-9EAD-4C129E54BB4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6E0EAE6-8EBB-4B30-9EAD-4C129E54BB4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D319A1A5-6EB2-4FA1-91F3-548CE3B5C4E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D319A1A5-6EB2-4FA1-91F3-548CE3B5C4E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D319A1A5-6EB2-4FA1-91F3-548CE3B5C4E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D319A1A5-6EB2-4FA1-91F3-548CE3B5C4E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
