@@ -13,7 +13,9 @@ namespace GitHubApiClient {
         }
 
         public DateTime Date() {
-            return CommitInfo.Author?.Date ?? DateTime.MinValue;
+            DateTime utcDate = CommitInfo.Author?.Date ?? DateTime.MinValue;
+            return utcDate != DateTime.MinValue ? utcDate.AddHours(3) : DateTime.MinValue;
         }
+        
     }
 }

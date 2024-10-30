@@ -27,7 +27,7 @@ var selectedRepo = repositories.FirstOrDefault(repo => repo.Name.Equals(reposito
 if (selectedRepo != null) {
     Console.WriteLine($"Репозиторий: {selectedRepo.Name}");
     Console.WriteLine();
-
+    
     var commits = await GetCommitsAsync(client, selectedRepo.Owner.Login, selectedRepo.Name);
     foreach (var commit in commits){
         Console.WriteLine($"Commit SHA: {commit.Sha}");
