@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reflection", "Reflection\Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedefiningOperators", "RedefiningOperators\RedefiningOperators.csproj", "{612D67B3-99D0-472C-891D-63FE5DC16BFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubApiClient", "GitHubApiClient\GitHubApiClient.csproj", "{3FB38817-5401-43C1-8FDB-FC90BE3B10EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{612D67B3-99D0-472C-891D-63FE5DC16BFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{612D67B3-99D0-472C-891D-63FE5DC16BFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{612D67B3-99D0-472C-891D-63FE5DC16BFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FB38817-5401-43C1-8FDB-FC90BE3B10EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FB38817-5401-43C1-8FDB-FC90BE3B10EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FB38817-5401-43C1-8FDB-FC90BE3B10EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FB38817-5401-43C1-8FDB-FC90BE3B10EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
