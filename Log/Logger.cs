@@ -12,8 +12,14 @@ namespace Log {
         public void Info(string message) {
             this._logger?.Info(message);
         }
-        public void Error(string message, Exception ? ex = null) {
-            this._logger?.Error(message, ex?.InnerException);
+        
+        public void Error(string message, Exception? ex = null) {
+            this._logger?.Error(message, ex);
+            if (ex?.InnerException != null) {
+                this._logger?.Error("Inner Exception: " + ex.InnerException.Message, ex.InnerException);
+            }
         }
+
+
     }
 }

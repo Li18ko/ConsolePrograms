@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -9,12 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\GitHubApiClient\GitHubApiClient.csproj" />
-      <ProjectReference Include="..\Helpers\Helpers.csproj" />
       <ProjectReference Include="..\Log\Log.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="log4net" Version="3.0.3-preview.1" />
     </ItemGroup>
 
 </Project>

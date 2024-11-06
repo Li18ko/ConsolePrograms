@@ -1,7 +1,8 @@
-﻿using GitHubApiClient;
-using log4net;
-using System.Reflection;
+﻿using System.Reflection;
+using GitHubApiClient;
+using Helpers;
 using Log;
+using log4net;
 using log4net.Config;
 
 namespace СonsolePrograms {
@@ -9,12 +10,11 @@ namespace СonsolePrograms {
         static async Task Main(string[] args) {
             var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
             XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+            
             var demo = new Logger();
             demo.Info("Начало");
             
-            Console.WriteLine("Введите токен: ");
-            demo.Info("Ввод токена");
-            string token = Console.ReadLine();
+            string token = GitHubHelpers.GetInput("Введите токен: ", demo);
 
             try {
                 demo.Debug("Создание экземпляра GitHubClient");
@@ -26,13 +26,10 @@ namespace СonsolePrograms {
                 
                 foreach (var repo in repositories)
                 {
-                    Console.WriteLine($"Name: {repo.Name}");
-                    Console.WriteLine($"GitHub: {repo.GitHubHomeUrl}");
-                    Console.WriteLine();
+                    GitHubHelpers.PrintRepositoryInfo(repo);
                 }
 
-                Console.Write("Введите имя репозитория: ");
-                string repositoryName = Console.ReadLine();
+                string repositoryName = GitHubHelpers.GetInput("Введите имя репозитория: ", demo);
 
                 try {
                     demo.Debug($"Поиск репозитория '{repositoryName}'");
@@ -45,33 +42,25 @@ namespace СonsolePrograms {
                     var commits = await gitHubClient.GetCommits(selectedRepo.Owner.Login, selectedRepo.Name);
                     demo.Debug("Коммиты найдены");
                     foreach (var commit in commits) {
-                        Console.WriteLine($"Commit SHA: {commit.Sha}");
-                        Console.WriteLine($"Author: {commit.AuthorName()}");
-                        Console.WriteLine(
-                            $"Date: {(commit.Date() == DateTime.MinValue ? "Unknown Date" : commit.Date().ToString())}");
-                        Console.WriteLine($"Message: {commit.Message()}");
-                        Console.WriteLine();
+                        GitHubHelpers.PrintCommitInfo(commit);
                     }
                 }
                 catch (HttpRequestException ex) {
-                    demo.Error("Ошибка при HTTP-запросе: " + ex.Message);
-                    demo.Error("StackTrace: " + ex.StackTrace);
+                    demo.Error("Ошибка при HTTP-запросе: " + ex);
                 }
                 catch (NullReferenceException ex) {
-                    demo.Error($"Репозитория с именем '{repositoryName}' не существует");
+                    demo.Error($"Репозитория с именем '{repositoryName}' не существует, " + ex);
                 }
                 catch (Exception ex) {
-                    demo.Error("Произошла непредвиденная ошибка: " + ex.Message);
-                    demo.Error("StackTrace: " + ex.StackTrace);
+                    demo.Error("Произошла непредвиденная ошибка: " + ex);
                 }
                 
             }
             catch (HttpRequestException ex) when (ex.Message.Contains("401 (Unauthorized)")) {
-                demo.Error("Ошибка 401: Неверный или недействительный токен.");
+                demo.Error("Ошибка 401: Неверный или недействительный токен, " + ex);
             }
             catch (Exception ex) {
-                demo.Error("Произошла непредвиденная ошибка: " + ex.Message);
-                demo.Error("StackTrace: " + ex.StackTrace);
+                demo.Error("Произошла непредвиденная ошибка: " + ex);
             }
             finally {
                 demo.Info("Программа завершена");
