@@ -15,6 +15,13 @@
 
     <ItemGroup>
       <PackageReference Include="log4net" Version="3.0.3-preview.1" />
+      <PackageReference Include="PH.RollingZipRotatorLog4net" Version="2.0.15" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Log\log4net.config">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

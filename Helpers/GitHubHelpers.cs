@@ -1,11 +1,11 @@
 ﻿using GitHubApiClient;
-using Log;
+using log4net;
 
 namespace Helpers {
     public static class GitHubHelpers {
-        public static string GetInput(string str, Logger logger) {
+        public static string GetInput(string str, ILog log) {
             Console.WriteLine(str);
-            logger.Info(str);
+            log.Info(str);
             return Console.ReadLine();
         }
 

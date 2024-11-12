@@ -1,69 +1,82 @@
-﻿using System.Reflection;
-using GitHubApiClient;
+﻿using GitHubApiClient;
 using Helpers;
-using Log;
 using log4net;
 using log4net.Config;
 
 namespace СonsolePrograms {
+    
     public class Program {
+        
+        private static readonly ILog log = LogManager.GetLogger(typeof(Program));
         static async Task Main(string[] args) {
-            var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-            XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
+            XmlConfigurator.Configure(new FileInfo("Log\\log4net.config"));
             
-            var demo = new Logger();
-            demo.Info("Начало");
+            string[] directories = { 
+                @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\", 
+                @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\errors\" 
+            };
+
+            string[] zipPaths = { 
+                @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\archive.zip", 
+                @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\errors\archive.zip" 
+            };
             
-            string token = GitHubHelpers.GetInput("Введите токен: ", demo);
+            for (int i = 0; i < directories.Length; i++) {
+                LogArchiver.ArchiveLogs(directories[i], zipPaths[i]);
+            }
+            
+            log.Info("Начало");
+            
+            string token = GitHubHelpers.GetInput("Введите токен: ", log);
 
             try {
-                demo.Debug("Создание экземпляра GitHubClient");
+                log.Debug("Создание экземпляра GitHubClient");
                 GitHubClient gitHubClient = new GitHubClient(token);
                 
-                demo.Debug("Запрашиване списка репозиториев");
+                log.Debug("Запрашиване списка репозиториев");
                 var repositories = await gitHubClient.GetRepositories();
-                demo.Debug("Http запрос успешен, список репозиториев получен");
+                log.Debug("Http запрос успешен, список репозиториев получен");
                 
                 foreach (var repo in repositories)
                 {
                     GitHubHelpers.PrintRepositoryInfo(repo);
                 }
 
-                string repositoryName = GitHubHelpers.GetInput("Введите имя репозитория: ", demo);
-
+                string repositoryName = GitHubHelpers.GetInput("Введите имя репозитория: ", log);
+                    
                 try {
-                    demo.Debug($"Поиск репозитория '{repositoryName}'");
+                    log.Debug($"Поиск репозитория '{repositoryName}'");
                     var selectedRepo = repositories.FirstOrDefault(repo =>
                         repo.Name.Equals(repositoryName, StringComparison.OrdinalIgnoreCase));
                     
-                    demo.Debug($"Репозиторий существует: {selectedRepo.Name}");
+                    log.Debug($"Репозиторий существует: {selectedRepo.Name}");
 
-                    demo.Debug($"Запрашивание списка коммитов репозитория '{repositoryName}'");
+                    log.Debug($"Запрашивание списка коммитов репозитория '{repositoryName}'");
                     var commits = await gitHubClient.GetCommits(selectedRepo.Owner.Login, selectedRepo.Name);
-                    demo.Debug("Коммиты найдены");
+                    log.Debug("Коммиты найдены");
                     foreach (var commit in commits) {
                         GitHubHelpers.PrintCommitInfo(commit);
                     }
                 }
                 catch (HttpRequestException ex) {
-                    demo.Error("Ошибка при HTTP-запросе: " + ex);
+                    log.Error("Ошибка при HTTP-запросе: " + ex);
                 }
                 catch (NullReferenceException ex) {
-                    demo.Error($"Репозитория с именем '{repositoryName}' не существует, " + ex);
+                    log.Error($"Репозитория с именем '{repositoryName}' не существует, " + ex);
                 }
                 catch (Exception ex) {
-                    demo.Error("Произошла непредвиденная ошибка: " + ex);
+                    log.Error("Произошла непредвиденная ошибка: " + ex);
                 }
                 
             }
             catch (HttpRequestException ex) when (ex.Message.Contains("401 (Unauthorized)")) {
-                demo.Error("Ошибка 401: Неверный или недействительный токен, " + ex);
+                log.Error("Ошибка 401: Неверный или недействительный токен, " + ex);
             }
             catch (Exception ex) {
-                demo.Error("Произошла непредвиденная ошибка: " + ex);
+                log.Error("Произошла непредвиденная ошибка: " + ex);
             }
             finally {
-                demo.Info("Программа завершена");
+                log.Info("Программа завершена");
             }
         }
 
