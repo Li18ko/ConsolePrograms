@@ -9,7 +9,7 @@ namespace СonsolePrograms {
         
         private static readonly ILog log = LogManager.GetLogger(typeof(Program));
         static async Task Main(string[] args) {
-            XmlConfigurator.Configure(new FileInfo("Log\\log4net.config"));
+            XmlConfigurator.Configure(new FileInfo("log4net.config"));
             
             string[] directories = { 
                 @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\", 

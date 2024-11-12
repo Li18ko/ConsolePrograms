@@ -7,7 +7,9 @@ namespace СonsolePrograms {
             IEnumerable<string> files = Directory.EnumerateFiles(sourceDirectory, "*.log");
             IEnumerable<string> logFiles = files.Where(file => {
                 DateTime fileLastWriteTime = File.GetLastWriteTime(file);
-                return fileLastWriteTime <= DateTime.Now.AddDays(-1);
+                DateTime currentDate = DateTime.Now.Date;
+                DateTime fileDate = fileLastWriteTime.Date;
+                return (currentDate - fileDate).Days >= 1;
             });
             
             using (ZipArchive zip = ZipFile.Open(zipPath, ZipArchiveMode.Update)) {

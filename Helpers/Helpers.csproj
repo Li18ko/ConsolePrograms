@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Log\Log.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="log4net" Version="3.0.3-preview.1" />
+    </ItemGroup>
+
 </Project>
