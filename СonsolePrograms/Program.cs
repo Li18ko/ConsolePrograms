@@ -72,15 +72,15 @@ namespace СonsolePrograms {
             }
             catch (HttpRequestException ex) {
                 log.Error("Ошибка при HTTP-запросе: " + ex.Message);
-                throw new HttpRequestException("Ошибка при HTTP-запросе");
+                throw;
             }
             catch (NullReferenceException ex) {
                 log.Error($"Репозитория с таким именем не существует, " + ex.Message);
-                throw new NullReferenceException($"Репозитория с таким именем не существует");
+                throw;
             }
             catch (Exception ex) {
                 log.Error("Произошла непредвиденная ошибка: " + ex.Message);
-                throw new Exception("Произошла непредвиденная ошибка");
+                throw;
             }
             finally {
                 log.Info("Программа завершена");
