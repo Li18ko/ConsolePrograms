@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "СonsolePrograms", "СonsolePrograms\СonsolePrograms.csproj", "{D9212B1C-AC3C-4839-8F52-3C729DF83CA5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolePrograms", "ConsolePrograms\ConsolePrograms.csproj", "{D9212B1C-AC3C-4839-8F52-3C729DF83CA5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOP", "OOP\OOP.csproj", "{B6E0EAE6-8EBB-4B30-9EAD-4C129E54BB4E}"
 EndProject

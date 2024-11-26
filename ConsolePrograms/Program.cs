@@ -1,4 +1,5 @@
-﻿using GitHubApiClient;
+﻿using ConsolePrograms;
+using GitHubApiClient;
 using Helpers;
 using log4net;
 using log4net.Config;
@@ -10,21 +11,6 @@ namespace СonsolePrograms {
         private static readonly ILog log = LogManager.GetLogger(typeof(Program));
         static async Task Main(string[] args) {
             XmlConfigurator.Configure(new FileInfo("log4net.config"));
-            
-            string[] directories = { 
-                @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\", 
-                @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\errors\" 
-            };
-
-            string[] zipPaths = { 
-                @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\archive.zip", 
-                @"D:\C#\СonsolePrograms\ConsolePrograms\СonsolePrograms\bin\Debug\net8.0\log\errors\archive.zip" 
-            };
-            
-            for (int i = 0; i < directories.Length; i++) {
-                LogArchiver.ArchiveLogs(directories[i], zipPaths[i]);
-            }
-            
             log.Info("Начало");
             
             string token = GitHubHelpers.GetInput("Введите токен: ", log);

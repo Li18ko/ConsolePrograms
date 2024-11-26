@@ -4,10 +4,10 @@ namespace WebGitHubApplication {
     public class Program {
         public static void Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             string githubToken = builder.Configuration["GitHubApi:Token"];
             builder.Services.AddSingleton<IGitHubClient>(new GitHubClient(githubToken));
             builder.Services.AddControllers();
-            
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             
