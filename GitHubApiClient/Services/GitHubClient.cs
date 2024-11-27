@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Net.Http.Headers;
+using WebGitHubApplication;
 
 
 namespace GitHubApiClient {
@@ -16,19 +17,39 @@ namespace GitHubApiClient {
     
     
         public async Task<List<Repository>> GetRepositories() {
-            await using Stream stream =
-                await client.GetStreamAsync("/user/repos");
-            var repositories =
-                await JsonSerializer.DeserializeAsync<List<Repository>>(stream);
-            return repositories ?? new();
+            var response = await client.GetAsync("/user/repos");
+            if (!response.IsSuccessStatusCode) {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                throw new GitHubApiException(
+                    $"GitHub API returned an error while fetching repositories: {errorResponse}",
+                    (int)response.StatusCode,
+                    errorResponse
+                );
+            }
+
+            var stream = await response.Content.ReadAsStreamAsync();
+            var repositories = await JsonSerializer.DeserializeAsync<List<Repository>>(stream);
+
+            return repositories ?? new List<Repository>();
         }
 
         public async Task<List<Commit>> GetCommits(string owner, string repo) {
             string url = $"/repos/{owner}/{repo}/commits";
-            await using Stream stream = await client.GetStreamAsync(url);
+            var response = await client.GetAsync(url);
 
+            if (!response.IsSuccessStatusCode) {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                throw new GitHubApiException(
+                    $"GitHub API returned an error while fetching commits for {owner}/{repo}: {errorResponse}",
+                    (int)response.StatusCode,
+                    errorResponse
+                );
+            }
+
+            var stream = await response.Content.ReadAsStreamAsync();
             var commits = await JsonSerializer.DeserializeAsync<List<Commit>>(stream);
-            return commits ?? new();
+
+            return commits ?? new List<Commit>();
         }
     }
 }
