@@ -10,6 +10,7 @@
       <ProjectReference Include="..\GitHubApiClient\GitHubApiClient.csproj" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+        <ProjectReference Include="..\Log\Log.csproj" />
     </ItemGroup>
 
 </Project>

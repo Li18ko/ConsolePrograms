@@ -1,26 +1,40 @@
+using ILogger = Log.ILogger;
+
 namespace WebGitHubApplication {
     public class ErrorHandlingMiddleware {
         private readonly RequestDelegate _next;
+        private readonly Log.Logger _logger;
         
-        public ErrorHandlingMiddleware(RequestDelegate next){
+        public ErrorHandlingMiddleware(RequestDelegate next, Log.Logger logger){
             _next = next;
+            _logger = logger;
         }
         
         public async Task InvokeAsync(HttpContext httpContext) {
             try {
-                await _next(httpContext); 
+                await _next(httpContext);
             }
-            catch (Exception ex)
-            {
-                var response = httpContext.Response;
-                response.ContentType = "application/json";
-
-                response.StatusCode = 500;
-                var errorResponse = new {
-                    details = ex.Message,
-                    stackTrace = ex.StackTrace
+            catch (GitHubApiException ex) {
+                _logger.Error($"Произошла ошибка: {ex.Message}");
+                _logger.Error($"Стек вызовов: {ex.StackTrace}");
+                httpContext.Response.StatusCode = ex.StatusCode;
+                httpContext.Response.ContentType = "application/json";
+                var response = new { 
+                    message = ex.Message
                 };
-                await response.WriteAsJsonAsync(errorResponse);
+                await httpContext.Response.WriteAsJsonAsync(response);
+            }
+            catch (Exception ex) {
+                _logger.Error($"Произошла ошибка: {ex.Message}");
+                _logger.Error($"Стек вызовов: {ex.StackTrace}");
+                
+                httpContext.Response.ContentType = "application/json";
+                httpContext.Response.StatusCode = 500;
+                var response = new { 
+                    message = "An unexpected error occurred.", 
+                    error = ex.Message 
+                };
+                await httpContext.Response.WriteAsJsonAsync(response);
             }
         }
     }

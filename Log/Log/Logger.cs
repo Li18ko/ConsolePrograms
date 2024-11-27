@@ -1,8 +1,9 @@
 ﻿namespace Log {
     public class Logger {
-        private readonly List<ILogger> _loggers = new List<ILogger>();
+        private readonly List<ILogger> _loggers;
 
-        public Logger() {
+        public Logger(IEnumerable<ILogger> loggers) {
+            _loggers = loggers.ToList();   
         }
 
         public void AddLogger(ILogger logger) {
