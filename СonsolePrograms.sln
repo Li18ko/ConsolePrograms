@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "Helpers\Helpers.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebGitHubApplication", "WebGitHubApplication\WebGitHubApplication.csproj", "{E78CC50A-C2C9-4F13-8E28-1CE0F685151F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.Appender", "log4net.Appender\log4net.Appender.csproj", "{A7E13820-1609-4780-BF7F-3CEB7DDA8152}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +62,9 @@ Global
 		{E78CC50A-C2C9-4F13-8E28-1CE0F685151F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E78CC50A-C2C9-4F13-8E28-1CE0F685151F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E78CC50A-C2C9-4F13-8E28-1CE0F685151F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7E13820-1609-4780-BF7F-3CEB7DDA8152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7E13820-1609-4780-BF7F-3CEB7DDA8152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7E13820-1609-4780-BF7F-3CEB7DDA8152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7E13820-1609-4780-BF7F-3CEB7DDA8152}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package>
+    <metadata>
+        <id>CustomLibRollingFileAppenderForNuGet</id>
+        <version>1.0.0</version>
+        <authors>Elizaveta Korneeva</authors>
+        <description>Кастомизация библиотеки RollingFileAppender</description>
+        <license type="expression">MIT</license> 
+    </metadata>
+</package>
