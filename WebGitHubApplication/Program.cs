@@ -1,6 +1,7 @@
 using GitHubApiClient;
 using Log;
 using Microsoft.Extensions.DependencyInjection;
+using UserRepository;
 using ILogger = Log.ILogger;
 
 namespace WebGitHubApplication {
@@ -23,7 +24,16 @@ namespace WebGitHubApplication {
                 throw new Exception("GitHub API Token отсутствует в конфигурации!");
             }
             logger.Info("GitHub API Token загружен успешно");
+            
+            
+            string connectionString = builder.Configuration["DB:Connection"];
+            if (string.IsNullOrEmpty(connectionString)) {
+                logger.Error("Не удалось загрузить данные для подключения к бд из конфигурации");
+                throw new Exception("Данные подключения к бд отсутствуют в конфигурации!");
+            }
+            logger.Info("Данные подключения к бд успешно загружены");
             builder.Services.AddSingleton<IGitHubClient>(new GitHubClient(githubToken));
+            builder.Services.AddSingleton<IUserRepository>(new UserRepositoryDapper(connectionString));
             
             
             
