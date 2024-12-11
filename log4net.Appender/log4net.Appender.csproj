@@ -11,6 +11,7 @@
         <Authors>Elizaveta Korneeva</Authors>
         <Description>Кастомизация библиотеки RollingFileAppender</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RestorePackagesPath>D:\C#\local.nuget\</RestorePackagesPath>
     </PropertyGroup>
 
     <ItemGroup>
