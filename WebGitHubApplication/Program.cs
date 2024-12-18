@@ -1,7 +1,10 @@
 using GitHubApiClient;
 using Log;
 using Microsoft.Extensions.DependencyInjection;
-using UserRepository;
+using Npgsql;
+using ListRepositories;
+using ListRepositories.ConnectionFactory;
+using ServiceListRepositories;
 using ILogger = Log.ILogger;
 
 namespace WebGitHubApplication {
@@ -32,10 +35,11 @@ namespace WebGitHubApplication {
                 throw new Exception("Данные подключения к бд отсутствуют в конфигурации!");
             }
             logger.Info("Данные подключения к бд успешно загружены");
+            builder.Services.AddSingleton<IConnectionFactory>(connection => new ConnectionFactory(connectionString));
             builder.Services.AddSingleton<IGitHubClient>(new GitHubClient(githubToken));
-            builder.Services.AddSingleton<IUserRepository>(new UserRepositoryDapper(connectionString));
+            builder.Services.AddSingleton<IUserRepository, UserRepository>();
             
-            
+            builder.Services.AddScoped<UserService>();
             
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();

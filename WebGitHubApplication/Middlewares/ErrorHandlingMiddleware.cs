@@ -19,7 +19,7 @@ namespace WebGitHubApplication {
                 _logger.Error($"Стек вызовов: {ex.StackTrace}");
                 httpContext.Response.StatusCode = ex.StatusCode;
                 httpContext.Response.ContentType = "application/json";
-                var response = new { 
+                var response = new {
                     message = ex.Message
                 };
                 await httpContext.Response.WriteAsJsonAsync(response);

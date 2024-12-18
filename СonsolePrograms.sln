@@ -22,7 +22,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "log4net.Appender", "log4net
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseTests", "DatabaseTests\DatabaseTests.csproj", "{9AC45A26-84F6-4761-8476-44BE6CCB2376}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserRepository", "UserRepository\UserRepository.csproj", "{75481DBD-0734-4B50-835C-01C1608E54B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ListRepositories", "ListRepositories\ListRepositories.csproj", "{75481DBD-0734-4B50-835C-01C1608E54B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceListRepositories", "ServiceListRepositories\ServiceListRepositories.csproj", "{2FB6F472-CF45-4F23-8FA4-2C46EE984C21}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,5 +80,9 @@ Global
 		{75481DBD-0734-4B50-835C-01C1608E54B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75481DBD-0734-4B50-835C-01C1608E54B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75481DBD-0734-4B50-835C-01C1608E54B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FB6F472-CF45-4F23-8FA4-2C46EE984C21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FB6F472-CF45-4F23-8FA4-2C46EE984C21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FB6F472-CF45-4F23-8FA4-2C46EE984C21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FB6F472-CF45-4F23-8FA4-2C46EE984C21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
