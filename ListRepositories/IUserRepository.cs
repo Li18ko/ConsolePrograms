@@ -2,10 +2,12 @@ using ListRepositories.Model;
 
 namespace ListRepositories {
     public interface IUserRepository {
-        IEnumerable<User> GetList(CancellationToken cancellationToken);
-        User Get(int id, CancellationToken cancellationToken);
-        void Update(User user, CancellationToken cancellationToken);
-        void Delete(int id, CancellationToken cancellationToken);
-        void Insert(UserWithoutId user, CancellationToken cancellationToken);
+        Task<IEnumerable<User>> GetListAsync(CancellationToken cancellationToken);
+        Task<User?> GetAsync(int id, CancellationToken cancellationToken);
+        Task UpdateAsync(User user, CancellationToken cancellationToken);
+        Task DeleteAsync(int id, CancellationToken cancellationToken);
+        Task<int> InsertAsync(UserWithoutId user, CancellationToken cancellationToken);
+
+        Task<int> RoleExistsAsync(int id, CancellationToken cancellationToken);
     }
 }

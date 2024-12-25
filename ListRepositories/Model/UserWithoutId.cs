@@ -5,5 +5,9 @@ namespace ListRepositories.Model {
         public string Name { get; set; }
         public string Phone { get; set; }
         public string Note { get; set; }
+        public Role Role { get; set; }
+        public int RoleId { get; set; }
     }
+    
+    
 }
