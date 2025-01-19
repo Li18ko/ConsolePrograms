@@ -30,8 +30,8 @@ namespace WebInstallationOfFloorsApplication {
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
             
-            builder.Services.AddSingleton<IConnectionFactory>(connection => 
-                new ConnectionFactory(connectionString));
+            builder.Services.AddScoped<TaskRepository>();
+            builder.Services.AddScoped<TaskService>();
             
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
