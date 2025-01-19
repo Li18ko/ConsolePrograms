@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using TelegramBot.Helper;
 using TelegramBot.Model;
 using Task = TelegramBot.Model.Task;
@@ -8,10 +7,10 @@ using Task = TelegramBot.Model.Task;
 namespace TelegramBot;
 
 public class AppDbContext: DbContext {
-    public DbSet<User> Users { get; set; }
-    public DbSet<Task> Tasks { get; set; }
-    public DbSet<Role> Roles { get; set; }
-    public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<User> User { get; set; }
+    public DbSet<Task> Task { get; set; }
+    public DbSet<Role> Role { get; set; }
+    public DbSet<UserRole> UserRole { get; set; }
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {
     }
@@ -36,7 +35,7 @@ public class AppDbContext: DbContext {
                     Id = i,
                     Name = $"User {i}",
                     Login = $"Login{i}",
-                    Password = PasswordHelper.HashPassword($"Password{i}", PasswordHelper.GenerateSalt())
+                    Password = PasswordHelper.HashPassword($"Password{i}")
                 };
             }).ToArray()
         );

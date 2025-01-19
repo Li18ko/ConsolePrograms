@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-
 namespace TelegramBot.Model;
 
 public class User {
