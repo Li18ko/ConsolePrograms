@@ -16,6 +16,10 @@ public class AppDbContext: DbContext {
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
         
+        modelBuilder.Entity<Task>()
+            .Property(t => t.Status)
+            .HasConversion<string>();
+        
         modelBuilder.Entity<Role>().HasData(
             new Role { Id = 1, Name = "Admin" },
             new Role { Id = 2, Name = "Worker" },

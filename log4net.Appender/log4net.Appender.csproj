@@ -5,13 +5,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
+        <OutputType>Library</OutputType>
+
         <PackageId>CustomLibRollingFileAppenderForNuGet</PackageId>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Version>1.0.0</Version>
         <Authors>Elizaveta Korneeva</Authors>
         <Description>Кастомизация библиотеки RollingFileAppender</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RestorePackagesPath>D:\C#\local.nuget\</RestorePackagesPath>
+        <RestorePackagesPath>D:\C#\NuGet repository\</RestorePackagesPath>
     </PropertyGroup>
 
     <ItemGroup>
