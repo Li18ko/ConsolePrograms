@@ -33,11 +33,21 @@ public class TaskService {
         return task;
     }
     
-    public async Task<int?> InsertTaskAsync(Task task, CancellationToken cancellationToken) {
-        if (task == null) {
+    public async Task<int?> InsertTaskAsync(TaskInsertDto dto, CancellationToken cancellationToken) {
+        if (dto == null) {
             _logger.Warning("Некорректные данные задачи в запросе на добавление");
             return null;
         }
+        
+        var task = new Task {
+            Title = dto.Title,
+            Deadline = dto.Deadline,
+            Comment = dto.Comment,
+            Address = dto.Address,
+            WorkerId = dto.WorkerId,
+            CreatedAt = DateTime.UtcNow.AddHours(3), 
+            Status = TaskStatus.Open
+        };
         
         logDebugRequestSuccessful("добавление новой задачи");
         var insertTask = await _taskRepository.InsertTaskAsync(task, cancellationToken);
@@ -45,24 +55,37 @@ public class TaskService {
         return insertTask;
     }
     
-    public async Task<Task> UpdateTaskAsync(Task task, CancellationToken cancellationToken) {
-        if (task == null || task.Id <= 0) {
+    public async Task<TaskUpdateDto> UpdateTaskAsync(TaskUpdateDto dto, CancellationToken cancellationToken) {
+        if (dto == null || dto.Id <= 0) {
             _logger.Warning("Некорректные данные задачи в запросе на обновление");
             return null;
         }
         
-        logDebugRequestSuccessful($"обновление данных о задаче c id = {task.Id}");
-        var updatedTask = await _taskRepository.GetTaskAsync(task.Id, cancellationToken);
+        logDebugRequestSuccessful($"обновление данных о задаче c id = {dto.Id}");
+        var updatedTask = await _taskRepository.GetTaskAsync(dto.Id, cancellationToken);
         if (updatedTask == null) {
-            throw new Exception($"Задача с id = {task.Id} не найдена");
+            throw new Exception($"Задача с id = {dto.Id} не найдена");
         }
         
-        await _taskRepository.UpdateTaskAsync(task, cancellationToken);
-        logDebugActionSuccessful($"найдена c id = {task.Id}");
+        updatedTask.Title = dto.Title;
+        updatedTask.Deadline = dto.Deadline;
+        updatedTask.Comment = dto.Comment;
+        updatedTask.Address = dto.Address;
+        updatedTask.WorkerId = dto.WorkerId;
+        updatedTask.Status = dto.Status;
         
-        var getUpdatedTask = await _taskRepository.GetTaskAsync(task.Id, cancellationToken);
+        await _taskRepository.UpdateTaskAsync(updatedTask, cancellationToken);
+        logDebugActionSuccessful($"найдена c id = {updatedTask.Id}");
         
-        return getUpdatedTask;
+        return new TaskUpdateDto {
+            Id = updatedTask.Id,
+            Title = updatedTask.Title,
+            Deadline = updatedTask.Deadline,
+            Comment = updatedTask.Comment,
+            Address = updatedTask.Address,
+            WorkerId = updatedTask.WorkerId,
+            Status = updatedTask.Status
+        };
     }
     
     public async System.Threading.Tasks.Task DeleteTaskAsync(int id, CancellationToken cancellationToken) {

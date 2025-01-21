@@ -55,19 +55,37 @@ public class UserWithRolesService {
         return userWithRolesDto;
     }
 
-    public async Task<int?> InsertUserAsync(User user, CancellationToken cancellationToken) {
-        if (user == null) {
+    public async Task<int?> InsertUserAsync(UserWithRolesInsertDto dto, CancellationToken cancellationToken) {
+        if (dto == null) {
             _logger.Warning("Некорректные данные пользователя в запросе на добавление");
             return null;
         }
         
         logDebugRequestSuccessful("добавление нового пользователя");
+        
+        var user = new User {
+            Name = dto.Name,
+            Login = dto.Login,
+            Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(dto.Password))),
+            ChatId = dto.ChatId,
+            UserRoles = new List<UserRole>()
+        };
+        
+        if (dto.RoleIds != null) {
+            foreach (var roleId in dto.RoleIds) {
+                user.UserRoles.Add(new UserRole {
+                    RoleId = roleId,
+                    User = user
+                });
+            }
+        }
+        
         var insertUser = await _userWithRolesRepository.InsertUserAsync(user, cancellationToken);
         logDebugActionSuccessful("добавлен");
         return insertUser;
     }
 
-    public async Task<User?> UpdateUserAsync(UserWithRolesUpdateDto dto, CancellationToken cancellationToken) {
+    public async Task<UserWithRolesUpdateDto> UpdateUserAsync(UserWithRolesUpdateDto dto, CancellationToken cancellationToken) {
         if (dto == null || dto.Id <= 0) {
             _logger.Warning("Некорректные данные пользователя в запросе на обновление");
             return null;
@@ -93,8 +111,15 @@ public class UserWithRolesService {
         
         await _userWithRolesRepository.UpdateUserAsync(updatedUser, cancellationToken);
         logDebugActionSuccessful($"найден c id = {dto.Id}");
-        
-        return updatedUser;
+
+        return new UserWithRolesUpdateDto {
+            Id = updatedUser.Id,
+            Name = updatedUser.Name,
+            Login = updatedUser.Login,
+            ChatId = updatedUser.ChatId,
+            RoleIds = updatedUser.UserRoles.Select(ur => ur.RoleId).ToList(),
+            Password = "******"
+        };
     }
     
     public async System.Threading.Tasks.Task DeleteUserAsync(int id, CancellationToken cancellationToken) {

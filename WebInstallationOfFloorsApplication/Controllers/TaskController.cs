@@ -23,34 +23,12 @@ public class TaskController : ControllerBase {
 
     [HttpPost]
     public async Task<int?> InsertTaskAsync([FromBody] TaskInsertDto dto, CancellationToken cancellationToken) {
-        var task = new Task {
-            Title = dto.Title,
-            Deadline = dto.Deadline,
-            Comment = dto.Comment,
-            Address = dto.Address,
-            WorkerId = dto.WorkerId,
-            CreatedAt = DateTime.UtcNow.AddHours(3), 
-            Status = TaskStatus.Open
-        };
-        return await _taskService.InsertTaskAsync(task, cancellationToken);
+        return await _taskService.InsertTaskAsync(dto, cancellationToken);
     }
 
     [HttpPut]
-    public async Task<Task> UpdateTaskAsync([FromBody] TaskUpdateDto dto, CancellationToken cancellationToken) {
-        var task = await _taskService.GetTaskAsync(dto.Id, cancellationToken);
-        
-        if (task == null) {
-            return null;  
-        }
-        
-        task.Title = dto.Title;
-        task.Deadline = dto.Deadline;
-        task.Comment = dto.Comment;
-        task.Address = dto.Address;
-        task.WorkerId = dto.WorkerId;
-        task.Status = dto.Status;
-        
-        return await _taskService.UpdateTaskAsync(task, cancellationToken);
+    public async Task<TaskUpdateDto> UpdateTaskAsync([FromBody] TaskUpdateDto dto, CancellationToken cancellationToken) {
+        return await _taskService.UpdateTaskAsync(dto, cancellationToken);
     }
 
     [HttpDelete("{id}")]
