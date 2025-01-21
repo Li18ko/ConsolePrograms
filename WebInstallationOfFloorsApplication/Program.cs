@@ -33,6 +33,9 @@ namespace WebInstallationOfFloorsApplication {
             builder.Services.AddScoped<TaskRepository>();
             builder.Services.AddScoped<TaskService>();
             
+            builder.Services.AddScoped<UserWithRolesRepository>();
+            builder.Services.AddScoped<UserWithRolesService>();
+            
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
