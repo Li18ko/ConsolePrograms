@@ -17,16 +17,14 @@ public class UserWithRolesService {
         logDebugRequestSuccessful("получение списка пользователей");
         var users = await _userWithRolesRepository.GetAllUsersAsync(cancellationToken);
         _logger.Debug($"Найдено пользователей: {users.Count()}");
-        
-        var userDtos = users.Select(user => new UserWithRolesGetDto {
+
+        return users.Select(user => new UserWithRolesGetDto {
             Id = user.Id,
             Name = user.Name,
             Login = user.Login,
             ChatId = user.ChatId,
             Roles = user.UserRoles.Select(ur => ur.RoleId).ToList() 
         }).ToList();
-
-        return userDtos;
     }
 
     public async Task<UserWithRolesGetDto> GetUserAsync(int id, CancellationToken cancellationToken) {
@@ -41,18 +39,15 @@ public class UserWithRolesService {
             throw new Exception($"Пользователь с id = {id} не найден");
         }
         
-        var roleIds = user.UserRoles.Select(ur => ur.RoleId).ToList();
-        
         logDebugActionSuccessful($"найден c id = {id}");
-        var userWithRolesDto = new UserWithRolesGetDto {
+        
+        return new UserWithRolesGetDto {
             Id = user.Id,
             Name = user.Name,
             Login = user.Login,
             ChatId = user.ChatId,
-            Roles = roleIds 
+            Roles = user.UserRoles.Select(ur => ur.RoleId).ToList() 
         };
-
-        return userWithRolesDto;
     }
 
     public async Task<int?> InsertUserAsync(UserWithRolesInsertDto dto, CancellationToken cancellationToken) {

@@ -34,4 +34,15 @@ public class TaskRepository {
         await _context.SaveChangesAsync(cancellationToken);
     }
     
+    public async Task<IEnumerable<Task>> GetPendingTasksAsync(CancellationToken cancellationToken) {
+        DateTime tomorrowUtc = DateTime.UtcNow.AddHours(3).AddDays(1).Date;
+        Console.WriteLine(tomorrowUtc);
+        
+        return await _context.Task
+            .Include(t => t.Worker)
+            .Where(t => t.Status == TaskStatus.Open && t.Deadline.ToUniversalTime().Date == tomorrowUtc)
+            .ToListAsync(cancellationToken);
+    }
+
+    
 }

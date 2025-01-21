@@ -30,11 +30,25 @@ namespace WebInstallationOfFloorsApplication {
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
             
+            string botToken = builder.Configuration["TelegramBot:ApiToken"];
+            if (string.IsNullOrEmpty(botToken)) {
+                logger.Error("Не удалось загрузить данные телеграм бота из конфигурации");
+                throw new Exception("Данные телеграм бота отсутствуют в конфигурации!");
+            }
+            logger.Info("Данные телеграм бота успешно загружены");
+            
             builder.Services.AddScoped<TaskRepository>();
             builder.Services.AddScoped<TaskService>();
             
             builder.Services.AddScoped<UserWithRolesRepository>();
             builder.Services.AddScoped<UserWithRolesService>();
+            
+            builder.Services.AddHostedService<TelegramBackgroundService>(provider => 
+                new TelegramBackgroundService(
+                    builder.Services.BuildServiceProvider().GetRequiredService<TaskRepository>(),
+                    builder.Services.BuildServiceProvider().GetRequiredService<Log.Logger>(),
+                    botToken)
+            );
             
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
