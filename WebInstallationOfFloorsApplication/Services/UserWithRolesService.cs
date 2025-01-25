@@ -1,30 +1,27 @@
 using System.Security.Cryptography;
 using System.Text;
 using Log;
+using MapsterMapper;
 
 namespace WebInstallationOfFloorsApplication;
 
 public class UserWithRolesService {
     private readonly Logger _logger;
     private readonly UserWithRolesRepository _userWithRolesRepository;
+    private readonly IMapper _mapper;
 
-    public UserWithRolesService(Logger logger, UserWithRolesRepository userWithRolesRepository) {
+    public UserWithRolesService(Logger logger, UserWithRolesRepository userWithRolesRepository, IMapper mapper) {
         _logger = logger;
         _userWithRolesRepository = userWithRolesRepository;
+        _mapper = mapper;
     }
 
     public async Task<IEnumerable<UserWithRolesGetDto>> GetAllUsersAsync(CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка пользователей");
         var users = await _userWithRolesRepository.GetAllUsersAsync(cancellationToken);
         _logger.Debug($"Найдено пользователей: {users.Count()}");
-
-        return users.Select(user => new UserWithRolesGetDto {
-            Id = user.Id,
-            Name = user.Name,
-            Login = user.Login,
-            ChatId = user.ChatId,
-            Roles = user.UserRoles.Select(ur => ur.RoleId).ToList() 
-        }).ToList();
+        
+        return users.Select(user => _mapper.Map<UserWithRolesGetDto>(user)).ToList();
     }
 
     public async Task<UserWithRolesGetDto> GetUserAsync(int id, CancellationToken cancellationToken) {
@@ -40,14 +37,8 @@ public class UserWithRolesService {
         }
         
         logDebugActionSuccessful($"найден c id = {id}");
-        
-        return new UserWithRolesGetDto {
-            Id = user.Id,
-            Name = user.Name,
-            Login = user.Login,
-            ChatId = user.ChatId,
-            Roles = user.UserRoles.Select(ur => ur.RoleId).ToList() 
-        };
+
+        return _mapper.Map<UserWithRolesGetDto>(user);
     }
 
     public async Task<int?> InsertUserAsync(UserWithRolesInsertDto dto, CancellationToken cancellationToken) {
@@ -58,21 +49,10 @@ public class UserWithRolesService {
         
         logDebugRequestSuccessful("добавление нового пользователя");
         
-        var user = new User {
-            Name = dto.Name,
-            Login = dto.Login,
-            Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(dto.Password))),
-            ChatId = dto.ChatId,
-            UserRoles = new List<UserRole>()
-        };
+        var user = _mapper.Map<User>(dto);
         
-        if (dto.RoleIds != null) {
-            foreach (var roleId in dto.RoleIds) {
-                user.UserRoles.Add(new UserRole {
-                    RoleId = roleId,
-                    User = user
-                });
-            }
+        foreach (var userRole in user.UserRoles) {
+            userRole.User = user; 
         }
         
         var insertUser = await _userWithRolesRepository.InsertUserAsync(user, cancellationToken);
@@ -92,29 +72,16 @@ public class UserWithRolesService {
             throw new Exception($"Пользователь с id = {dto.Id} не найден");
         }
         
-        updatedUser.Name = dto.Name;
-        updatedUser.Login = dto.Login;
-        updatedUser.ChatId = dto.ChatId;
-
-        if (!string.IsNullOrEmpty(dto.Password)) {
-            updatedUser.Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(dto.Password)));
-        }
+        updatedUser = _mapper.Map(dto, updatedUser);
         
-        if (dto.RoleIds != null) {
-            updatedUser.UserRoles = dto.RoleIds.Select(roleId => new UserRole { RoleId = roleId, User = updatedUser }).ToList();
+        foreach (var userRole in updatedUser.UserRoles) {
+            userRole.User = updatedUser; 
         }
         
         await _userWithRolesRepository.UpdateUserAsync(updatedUser, cancellationToken);
         logDebugActionSuccessful($"найден c id = {dto.Id}");
-
-        return new UserWithRolesUpdateDto {
-            Id = updatedUser.Id,
-            Name = updatedUser.Name,
-            Login = updatedUser.Login,
-            ChatId = updatedUser.ChatId,
-            RoleIds = updatedUser.UserRoles.Select(ur => ur.RoleId).ToList(),
-            Password = "******"
-        };
+        
+        return _mapper.Map<UserWithRolesUpdateDto>(updatedUser);
     }
     
     public async System.Threading.Tasks.Task DeleteUserAsync(int id, CancellationToken cancellationToken) {

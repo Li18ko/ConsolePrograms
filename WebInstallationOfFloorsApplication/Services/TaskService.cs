@@ -1,14 +1,18 @@
 using Log;
+using Mapster;
+using MapsterMapper;
 
 namespace WebInstallationOfFloorsApplication;
 
 public class TaskService {
     private readonly TaskRepository _taskRepository;
     private readonly Logger _logger;
+    private readonly IMapper _mapper;
 
-    public TaskService(TaskRepository taskRepository, Logger logger) {
+    public TaskService(TaskRepository taskRepository, Logger logger, IMapper mapper) {
         _taskRepository = taskRepository;
         _logger = logger;
+        _mapper = mapper;
     }
     
     public async Task<IEnumerable<Task>> GetAllTasksAsync(CancellationToken cancellationToken) {
@@ -39,15 +43,7 @@ public class TaskService {
             return null;
         }
         
-        var task = new Task {
-            Title = dto.Title,
-            Deadline = dto.Deadline,
-            Comment = dto.Comment,
-            Address = dto.Address,
-            WorkerId = dto.WorkerId,
-            CreatedAt = DateTime.UtcNow.AddHours(3), 
-            Status = TaskStatus.Open
-        };
+        var task = _mapper.Map<Task>(dto);
         
         logDebugRequestSuccessful("добавление новой задачи");
         var insertTask = await _taskRepository.InsertTaskAsync(task, cancellationToken);
@@ -67,25 +63,12 @@ public class TaskService {
             throw new Exception($"Задача с id = {dto.Id} не найдена");
         }
         
-        updatedTask.Title = dto.Title;
-        updatedTask.Deadline = dto.Deadline;
-        updatedTask.Comment = dto.Comment;
-        updatedTask.Address = dto.Address;
-        updatedTask.WorkerId = dto.WorkerId;
-        updatedTask.Status = dto.Status;
+        updatedTask = _mapper.Map(dto, updatedTask);
         
         await _taskRepository.UpdateTaskAsync(updatedTask, cancellationToken);
         logDebugActionSuccessful($"найдена c id = {updatedTask.Id}");
         
-        return new TaskUpdateDto {
-            Id = updatedTask.Id,
-            Title = updatedTask.Title,
-            Deadline = updatedTask.Deadline,
-            Comment = updatedTask.Comment,
-            Address = updatedTask.Address,
-            WorkerId = updatedTask.WorkerId,
-            Status = updatedTask.Status
-        };
+        return _mapper.Map<TaskUpdateDto>(updatedTask);
     }
     
     public async System.Threading.Tasks.Task DeleteTaskAsync(int id, CancellationToken cancellationToken) {

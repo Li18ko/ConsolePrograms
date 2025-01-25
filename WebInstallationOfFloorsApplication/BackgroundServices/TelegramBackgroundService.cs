@@ -48,8 +48,6 @@ public class TelegramBackgroundService: BackgroundService {
             catch (Exception ex) {
                 _logger.Error($"Ошибка при отправке сообщения: {ex.Message}");
             }
-            
-            await System.Threading.Tasks.Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
         }
         
     }

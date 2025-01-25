@@ -1,4 +1,6 @@
 using Log;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using ILogger = Log.ILogger;
 
@@ -6,6 +8,11 @@ namespace WebInstallationOfFloorsApplication {
     public class Program{
         public static void Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
+            
+            var config = TypeAdapterConfig.GlobalSettings;
+            config.Scan(typeof(MappingConfig).Assembly); 
+            var mapper = new Mapper(config);
+            builder.Services.AddSingleton<IMapper>(mapper);
             
             builder.Services.AddSingleton<ILogger, ConsoleLog>();
             
