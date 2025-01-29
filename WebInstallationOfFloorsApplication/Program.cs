@@ -6,7 +6,7 @@ using ILogger = Log.ILogger;
 
 namespace WebInstallationOfFloorsApplication {
     public class Program{
-        public static void Main(string[] args) {
+        public static async System.Threading.Tasks.Task Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
             
             var config = TypeAdapterConfig.GlobalSettings;
@@ -20,7 +20,7 @@ namespace WebInstallationOfFloorsApplication {
             if (!Directory.Exists(logDirectory)) {
                 Directory.CreateDirectory(logDirectory);
             }
-            builder.Services.AddSingleton<ILogger>(provider => new FileLog(Path.Combine(logDirectory, "log" + DateTime.Today.ToString("yyyy-MM-dd") + ".txt")));
+            builder.Services.AddSingleton<ILogger>(provider => new FileLog(Path.Combine(logDirectory, "log" + DateTime.Today.ToString("yyyy-MM-dd") + ".log")));
             builder.Services.AddSingleton<Log.Logger>();
             
             builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
@@ -50,12 +50,17 @@ namespace WebInstallationOfFloorsApplication {
             builder.Services.AddScoped<UserWithRolesRepository>();
             builder.Services.AddScoped<UserWithRolesService>();
             
-            builder.Services.AddHostedService<TelegramBackgroundService>(provider => 
-                new TelegramBackgroundService(
-                    builder.Services.BuildServiceProvider().GetRequiredService<TaskRepository>(),
-                    builder.Services.BuildServiceProvider().GetRequiredService<Log.Logger>(),
-                    botToken)
-            );
+            builder.Services.AddHttpClient();
+            builder.Services.AddScoped<TelegramRepository>();
+            builder.Services.AddScoped<TelegramService>(sp => {
+                var telegramRepository = sp.GetRequiredService<TelegramRepository>();
+                var logger = sp.GetRequiredService<Log.Logger>();
+                var httpClient = sp.GetRequiredService<HttpClient>();
+
+                return new TelegramService(telegramRepository, logger, httpClient, botToken);
+            });
+            
+            builder.Services.AddSingleton<IHostedService, TelegramBackgroundService>();
             
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -63,6 +68,13 @@ namespace WebInstallationOfFloorsApplication {
             logger.Info("Сервисы приложения успешно зарегистрированы");
             
             var app = builder.Build();
+            
+            using (var scope = app.Services.CreateScope()) {
+                var telegramService = scope.ServiceProvider.GetRequiredService<TelegramService>();
+                await telegramService.SetWebhookAsync(CancellationToken.None);
+            }
+
+            
             
             using (var scope = app.Services.CreateScope()) {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
