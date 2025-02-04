@@ -33,4 +33,24 @@ public class TaskRepository {
         _context.Task.Remove(task);
         await _context.SaveChangesAsync(cancellationToken);
     }
+    
+    public async Task<IEnumerable<Task>> GetTasksForTomorrow(CancellationToken cancellationToken) {
+        DateTime tomorrowUtc = DateTime.UtcNow.AddHours(3).AddDays(1).Date;
+        Console.WriteLine(tomorrowUtc);
+        
+        return await _context.Task
+            .Include(t => t.Worker)
+            .Where(t => t.Deadline.ToUniversalTime().Date == tomorrowUtc)
+            .OrderBy(t => t.Deadline)
+            .ToListAsync(cancellationToken);
+    }
+    
+    public async System.Threading.Tasks.Task UpdateTaskStatusAsync(long taskId, TaskStatus status, CancellationToken cancellationToken) {
+        var task = await _context.Task.FirstOrDefaultAsync(t => t.Id == taskId, cancellationToken);
+
+        if (task != null) {
+            task.Status = status;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+    }
 }

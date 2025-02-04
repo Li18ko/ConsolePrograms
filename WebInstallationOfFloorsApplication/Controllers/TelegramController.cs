@@ -18,8 +18,8 @@ public class TelegramController: ControllerBase {
     }
 
     [HttpPost("webhook")]
-    public async System.Threading.Tasks.Task HandleWebhookAsync([FromBody] JsonElement update, CancellationToken cancellationToken) {
-        await _telegramService.HandleWebhookUpdateAsync(update, cancellationToken);
-
+    public async System.Threading.Tasks.Task HandleWebhookAsync([FromBody] CallbackQueryDto callbackQueryDto, 
+        CancellationToken cancellationToken) {
+        await _telegramService.HandleWebhookUpdateAsync(callbackQueryDto, cancellationToken);
     }
 }

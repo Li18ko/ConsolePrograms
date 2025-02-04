@@ -44,6 +44,13 @@ namespace WebInstallationOfFloorsApplication {
             }
             logger.Info("Данные телеграм бота успешно загружены");
             
+            string ngrokUrl = builder.Configuration["ngrok:url"];
+            if (string.IsNullOrEmpty(ngrokUrl)) {
+                logger.Error("Не удалось загрузить url путь ngrok");
+                throw new Exception("Url ngrok отсутствует в конфигурации!");
+            }
+            logger.Info("Url ngrok успешно загружен");
+            
             builder.Services.AddScoped<TaskRepository>();
             builder.Services.AddScoped<TaskService>();
             
@@ -51,21 +58,32 @@ namespace WebInstallationOfFloorsApplication {
             builder.Services.AddScoped<UserWithRolesService>();
             
             builder.Services.AddHttpClient();
-            builder.Services.AddScoped<TelegramRepository>();
             builder.Services.AddScoped<TelegramService>(sp => {
-                var telegramRepository = sp.GetRequiredService<TelegramRepository>();
+                var taskRepository = sp.GetRequiredService<TaskRepository>();
                 var logger = sp.GetRequiredService<Log.Logger>();
                 var httpClient = sp.GetRequiredService<HttpClient>();
 
-                return new TelegramService(telegramRepository, logger, httpClient, botToken);
+                return new TelegramService(taskRepository, logger, httpClient, botToken, ngrokUrl);
             });
             
             builder.Services.AddSingleton<IHostedService, TelegramBackgroundService>();
             
             builder.Services.AddControllers();
+            
+            builder.Services.AddCors(options => {
+                options.AddPolicy("AllowAll", policy => {
+                    var env = builder.Environment;
+                    if (env.IsDevelopment()) {
+                        policy.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    }
+                });
+            });
+            
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            logger.Info("Сервисы приложения успешно зарегистрированы");
+            logger.Info("Сервисы приложения успешно зарегистрированы    ");
             
             var app = builder.Build();
             
@@ -74,7 +92,6 @@ namespace WebInstallationOfFloorsApplication {
                 await telegramService.SetWebhookAsync(CancellationToken.None);
             }
 
-            
             
             using (var scope = app.Services.CreateScope()) {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -91,6 +108,8 @@ namespace WebInstallationOfFloorsApplication {
             }
             
             app.UseMiddleware<ErrorHandlingMiddleware>(logger);
+            app.UseCors("AllowAll");
+            app.UseAuthorization();
             app.UseHttpsRedirection();
             app.MapControllers();
 
