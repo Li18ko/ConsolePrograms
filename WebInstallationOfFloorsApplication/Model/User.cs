@@ -6,5 +6,7 @@ public class User {
     public string Login {get;set;}
     public string Password {get;set;}
     public long ChatId {get;set;}
+    public DateTimeOffset CreatedAt {get;set;}
+    public DateTimeOffset LastRevision {get;set;}
     public ICollection<UserRole> UserRoles { get; set; }
 }

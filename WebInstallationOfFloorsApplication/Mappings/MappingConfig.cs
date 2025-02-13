@@ -8,7 +8,7 @@ public class MappingConfig: IRegister {
     
     public void Register(TypeAdapterConfig config) {
         config.NewConfig<TaskInsertDto, Task>()
-            .Map(dest => dest.CreatedAt, src => DateTime.UtcNow.AddHours(3))
+            .Map(dest => dest.CreatedAt, src => DateTimeOffset.UtcNow)
             .Map(dest => dest.Status, src => TaskStatus.Open);
         
         config.NewConfig<TaskUpdateDto, Task>();
@@ -18,6 +18,8 @@ public class MappingConfig: IRegister {
             .Map(dest => dest.Roles, src => src.UserRoles.Select(ur => ur.RoleId).ToList());
         
         config.NewConfig<UserWithRolesInsertDto, User>()
+            .Map(dest => dest.CreatedAt, src => DateTimeOffset.UtcNow)
+            .Map(dest => dest.LastRevision, src => DateTimeOffset.UtcNow)
             .Map(dest => dest.Password, src => 
                 Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(src.Password))))
             .Map(dest => dest.UserRoles, src => src.RoleIds.Select(roleId => new UserRole {
@@ -30,6 +32,7 @@ public class MappingConfig: IRegister {
             .Map(dest => dest.Password, src => "***");
 
         config.NewConfig<UserWithRolesUpdateDto, User>()
+            .Map(dest => dest.LastRevision, src => DateTimeOffset.UtcNow)
             .Map(dest => dest.Password, src => 
                 Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(src.Password))))
             .Map(dest => dest.UserRoles, src => src.RoleIds.Select(roleId => new UserRole {

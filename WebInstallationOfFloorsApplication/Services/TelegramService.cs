@@ -81,27 +81,22 @@ public class TelegramService {
     private async System.Threading.Tasks.Task SendTelegramMessageAsync(long chatId, string text, long taskId, 
         CancellationToken cancellationToken) {
         string url = $"/bot{_botToken}/sendMessage";
-
-        var parameters = new {
-            chat_id = chatId,
-            text = text,
-            parse_mode = "Markdown",
-            reply_markup = new {
-                inline_keyboard = taskId == 0 ? new List<List<object>> {} : new List<List<object>> {
-                    new List<object> {
-                        new { text = "Отменено", callback_data = JsonSerializer.Serialize(new {
-                            action = "Reject", 
-                            taskId = taskId 
-                        })},
-                        new { text = "Выполнено", callback_data = JsonSerializer.Serialize(new {
-                            action = "Done", 
-                            taskId = taskId
-                        })}
-                    }
-                }
+        
+        var inlineKeyboard = taskId == 0 ? new List<List<InlineKeyboardButton>> {} : 
+            new List<List<InlineKeyboardButton>> {
+            new List<InlineKeyboardButton> {
+                new InlineKeyboardButton("Отменено", JsonSerializer.Serialize(new {
+                    action = "Reject", 
+                    taskId = taskId
+                })),
+                new InlineKeyboardButton("Выполнено", JsonSerializer.Serialize(new {
+                    action = "Done", 
+                    taskId = taskId
+                }))
             }
         };
         
+        var parameters = new SendMessageParameters(chatId, text, "Markdown", new ReplyMarkup(inlineKeyboard));
         await SendPostRequestAsync(parameters, url, cancellationToken);
     }
     
@@ -109,18 +104,12 @@ public class TelegramService {
         CancellationToken cancellationToken) {
         string url = $"/bot{_botToken}/editMessageText";
 
-        var parameters = new {
-            chat_id = chatId,
-            message_id = messageId,
-            text = text,
-            parse_mode = "Markdown"
-        };
-        
+        var parameters = new EditMessageParameters(chatId, text, "Markdown", messageId);
         await SendPostRequestAsync(parameters, url, cancellationToken); 
     }
 
-    private async System.Threading.Tasks.Task SendPostRequestAsync(object parameters, string url, 
-        CancellationToken cancellationToken) {
+    private async System.Threading.Tasks.Task SendPostRequestAsync<T>(T parameters, string url, 
+        CancellationToken cancellationToken) where T : TelegramParameters {
         var json = JsonSerializer.Serialize(parameters);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
@@ -137,9 +126,11 @@ public class TelegramService {
     }
     
     private string FormatMessage(Task task) {
+        TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Moscow");
+        var deadlineMoscow = TimeZoneInfo.ConvertTime(task.Deadline, moscowTimeZone);
         return (task.Status == TaskStatus.Done ? $"✅ Задача выполнена! \n\n" : "") +
             (task.Status == TaskStatus.Reject ? $"❌ Задача отменена! \n\n" : "") +                                                          
-            $"📌 *Задача на {task.Deadline:dd.MM.yyyy HH:mm}*\n\n" +
+            $"📌 *Задача на {deadlineMoscow:dd.MM.yyyy HH:mm} (по Мск)*\n\n" +
             $"🔹 *Заголовок:* {task.Title}\n" +
             $"🏠 *Адрес:* {task.Address}\n" +
             $"📝 *Комментарий:* {task.Comment ?? "Нет комментария"}\n";

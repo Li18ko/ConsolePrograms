@@ -35,12 +35,12 @@ public class TaskRepository {
     }
     
     public async Task<IEnumerable<Task>> GetTasksForTomorrow(CancellationToken cancellationToken) {
-        DateTime tomorrowUtc = DateTime.UtcNow.AddHours(3).AddDays(1).Date;
+        DateTimeOffset tomorrowUtc = DateTimeOffset.UtcNow.AddDays(1).Date;
         Console.WriteLine(tomorrowUtc);
         
         return await _context.Task
             .Include(t => t.Worker)
-            .Where(t => t.Deadline.ToUniversalTime().Date == tomorrowUtc)
+            .Where(t => t.Deadline.Date == tomorrowUtc.Date)
             .OrderBy(t => t.Deadline)
             .ToListAsync(cancellationToken);
     }

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace WebInstallationOfFloorsApplication;
 
@@ -12,6 +13,12 @@ public class AppDbContext: DbContext {
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {
     }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+    }
+
     
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
@@ -33,7 +40,9 @@ public class AppDbContext: DbContext {
                     Name = $"User {i}",
                     Login = $"Login{i}",
                     Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes($"Password{i}"))),
-                    ChatId = -4681939671
+                    ChatId = -4681939671,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    LastRevision = DateTimeOffset.UtcNow
                 };
             }).ToArray()
         );
@@ -45,7 +54,9 @@ public class AppDbContext: DbContext {
                     Name = $"User {i + 5}",
                     Login = $"Login{i + 5}",
                     Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes($"Password{i + 5}"))),
-                    ChatId = -4701642993
+                    ChatId = -4701642993,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    LastRevision = DateTimeOffset.UtcNow
                 };
             }).ToArray()
         );
@@ -56,7 +67,9 @@ public class AppDbContext: DbContext {
                 Name = "User 11",
                 Login = "Login11",
                 Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("Password11"))),
-                ChatId = -4681939671
+                ChatId = -4681939671,
+                CreatedAt = DateTimeOffset.UtcNow,
+                LastRevision = DateTimeOffset.UtcNow
             }
         );
         
@@ -66,7 +79,9 @@ public class AppDbContext: DbContext {
                 Name = "User 12",
                 Login = "Login12",
                 Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("Password12"))),
-                ChatId = -4701642993
+                ChatId = -4701642993,
+                CreatedAt = DateTimeOffset.UtcNow,
+                LastRevision = DateTimeOffset.UtcNow
             }
         );
         

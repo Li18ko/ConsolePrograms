@@ -37,6 +37,7 @@ namespace WebInstallationOfFloorsApplication {
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
             
+            
             string botToken = builder.Configuration["TelegramBot:ApiToken"];
             if (string.IsNullOrEmpty(botToken)) {
                 logger.Error("Не удалось загрузить данные телеграм бота из конфигурации");
