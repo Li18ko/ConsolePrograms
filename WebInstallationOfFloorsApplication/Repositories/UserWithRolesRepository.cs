@@ -9,12 +9,25 @@ public class UserWithRolesRepository {
         _context = context;
     }
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync(CancellationToken cancellationToken) {
-        return await _context.User
+    public async Task<IEnumerable<User>> GetAllUsersAsync(string sort, CancellationToken cancellationToken) {
+        var query = _context.User
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
-            .ToListAsync(cancellationToken);
+            .AsQueryable();
 
+        query = sort switch {
+            "nameAsc" => query.OrderBy(u => u.Name),
+            "nameDesc" => query.OrderByDescending(u => u.Name),
+            "emailAsc" => query.OrderBy(u => u.Email),
+            "emailDesc" => query.OrderByDescending(u => u.Email),
+            "createdAtAsc" => query.OrderBy(u => u.CreatedAt),
+            "createdAtDesc" => query.OrderByDescending(u => u.CreatedAt),
+            "lastRevisionAsc" => query.OrderBy(u => u.LastRevision),
+            "lastRevisionDesc" => query.OrderByDescending(u => u.LastRevision),
+            _ => query.OrderBy(u => u.Name)
+        };
+        
+        return await query.ToListAsync(cancellationToken);
     }
     
     public async Task<User> GetUserAsync(int id, CancellationToken cancellationToken) {

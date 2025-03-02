@@ -15,8 +15,9 @@ public class UserWithRolesController : ControllerBase {
     }
 
     [HttpGet("List")]
-    public async Task<IEnumerable<UserWithRolesGetDto>> GetAllUsersAsync(CancellationToken cancellationToken) {
-        return await _userWithRolesService.GetAllUsersAsync(cancellationToken);
+    public async Task<IEnumerable<UserWithRolesGetDto>> GetAllUsersAsync(CancellationToken cancellationToken,
+        [FromQuery] string sort = "nameAsc") {
+        return await _userWithRolesService.GetAllUsersAsync(sort, cancellationToken);
     }
 
     [HttpGet("{id}")]
