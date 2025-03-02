@@ -40,11 +40,34 @@ public class UserWithRolesService {
 
         return _mapper.Map<UserWithRolesGetDto>(user);
     }
+    
+    public async Task<UserWithRolesGetDto> GetUserByLoginAsync(string login, CancellationToken cancellationToken) {
+        if (string.IsNullOrEmpty(login)) {
+            _logger.Warning("Некорректный логин");
+            return null;
+        }
+        logDebugRequestSuccessful($"получение пользователя по логину = {login}");
+        var user = await _userWithRolesRepository.GetUserByLoginAsync(login, cancellationToken);
+
+        if (user == null) {
+            throw new Exception($"Пользователь с логином = {login} не найден");
+        }
+        
+        logDebugActionSuccessful($"найден c логином = {login}");
+
+        return _mapper.Map<UserWithRolesGetDto>(user);
+    }
 
     public async Task<int?> InsertUserAsync(UserWithRolesInsertDto dto, CancellationToken cancellationToken) {
         if (dto == null) {
             _logger.Warning("Некорректные данные пользователя в запросе на добавление");
             return null;
+        }
+        
+        var existingUser = await _userWithRolesRepository.GetUserByLoginAsync(dto.Login, cancellationToken);
+        if (existingUser != null) {
+            _logger.Warning("Логин уже существует");
+            throw new Exception($"Логин уже существует");
         }
         
         logDebugRequestSuccessful("добавление нового пользователя");
@@ -64,6 +87,12 @@ public class UserWithRolesService {
         if (dto == null || dto.Id <= 0) {
             _logger.Warning("Некорректные данные пользователя в запросе на обновление");
             return null;
+        }
+        
+        var existingUser = await _userWithRolesRepository.GetUserByLoginAsync(dto.Login, cancellationToken);
+        if (existingUser != null && existingUser.Id != dto.Id) {
+            _logger.Warning("Логин уже существует");
+            throw new Exception($"Логин уже существует");
         }
         
         logDebugRequestSuccessful($"обновление данных о пользователе c id = {dto.Id}");

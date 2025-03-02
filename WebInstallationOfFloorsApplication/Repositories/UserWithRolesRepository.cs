@@ -23,13 +23,19 @@ public class UserWithRolesRepository {
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
     
-    public async Task<int?> InsertUserAsync(User user, CancellationToken cancellationToken) {
+    public async Task<User?> GetUserByLoginAsync(string login, CancellationToken cancellationToken) {
+        return await _context.User
+            .Include(u => u.UserRoles)
+            .FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
+    }
+    
+    public async Task<int?> InsertUserAsync(User? user, CancellationToken cancellationToken) {
         await _context.User.AddAsync(user, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         return user.Id;
     }
 
-    public async Task<User> UpdateUserAsync(User user, CancellationToken cancellationToken) {
+    public async Task<User?> UpdateUserAsync(User? user, CancellationToken cancellationToken) {
         _context.User.Update(user);
         await _context.SaveChangesAsync(cancellationToken);
         return user;

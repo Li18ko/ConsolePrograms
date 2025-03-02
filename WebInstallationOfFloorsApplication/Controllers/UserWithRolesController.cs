@@ -23,6 +23,11 @@ public class UserWithRolesController : ControllerBase {
     public async Task<UserWithRolesGetDto> GetUserAsync(int id, CancellationToken cancellationToken) {
         return await _userWithRolesService.GetUserAsync(id, cancellationToken);
     }
+    
+    [HttpGet("checkLogin/{login}")]
+    public async Task<UserWithRolesGetDto> GetUserByLoginAsync(string login, CancellationToken cancellationToken) {
+        return await _userWithRolesService.GetUserByLoginAsync(login, cancellationToken);
+    }
 
     [HttpPost]
     public async Task<int?> InsertUserAsync([FromBody] UserWithRolesInsertDto dto, CancellationToken cancellationToken) {

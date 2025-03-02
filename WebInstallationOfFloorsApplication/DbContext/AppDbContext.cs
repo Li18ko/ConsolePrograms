@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace WebInstallationOfFloorsApplication;
 
 public class AppDbContext: DbContext {
-    public DbSet<User> User { get; set; }
+    public DbSet<User?> User { get; set; }
     public DbSet<Task> Task { get; set; }
     public DbSet<Role> Role { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
@@ -38,6 +38,7 @@ public class AppDbContext: DbContext {
                 return new User {
                     Id = i,
                     Name = $"User {i}",
+                    Email = $"user{i}@example.com",
                     Login = $"Login{i}",
                     Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes($"Password{i}"))),
                     ChatId = -4681939671,
@@ -52,6 +53,7 @@ public class AppDbContext: DbContext {
                 return new User {
                     Id = i + 5,
                     Name = $"User {i + 5}",
+                    Email = $"user{i + 5}@example.com",
                     Login = $"Login{i + 5}",
                     Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes($"Password{i + 5}"))),
                     ChatId = -4701642993,
@@ -65,6 +67,7 @@ public class AppDbContext: DbContext {
             new User {
                 Id = 11, 
                 Name = "User 11",
+                Email = $"user11@example.com",
                 Login = "Login11",
                 Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("Password11"))),
                 ChatId = -4681939671,
@@ -77,6 +80,7 @@ public class AppDbContext: DbContext {
             new User {
                 Id = 12, 
                 Name = "User 12",
+                Email = $"user12@example.com",
                 Login = "Login12",
                 Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("Password12"))),
                 ChatId = -4701642993,
