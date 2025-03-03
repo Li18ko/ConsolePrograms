@@ -21,7 +21,7 @@ public class UserWithRolesUpdateDto {
         get => _password;
         set {
             if (!string.IsNullOrEmpty(value) && value.Length < 6) {
-                throw new ArgumentException("Пароль должен содержать минимум 6 символов.");
+                throw new ArgumentException("Пароль должен содержать минимум 6 символов");
             }
             _password = value;
         }
