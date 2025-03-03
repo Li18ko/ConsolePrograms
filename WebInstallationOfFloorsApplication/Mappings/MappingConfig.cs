@@ -29,7 +29,7 @@ public class MappingConfig: IRegister {
         
         config.NewConfig<User, UserWithRolesUpdateDto>()
             .Map(dest => dest.RoleIds, src => src.UserRoles.Select(ur => ur.RoleId).ToList())
-            .Map(dest => dest.Password, src => "***");
+            .Map(dest => dest.Password, src => "******");
 
         config.NewConfig<UserWithRolesUpdateDto, User>()
             .Map(dest => dest.LastRevision, src => DateTimeOffset.UtcNow)
@@ -39,9 +39,5 @@ public class MappingConfig: IRegister {
                 RoleId = roleId, 
                 User = null
             }).ToList());
-        
-
-
-
     }
 }

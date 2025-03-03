@@ -36,10 +36,22 @@ public class UserWithRolesRepository {
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
     
-    public async Task<User?> GetUserByLoginAsync(string login, CancellationToken cancellationToken) {
+    public async Task<bool> IsLoginTakenByOtherUserAsync(int id, string login, CancellationToken cancellationToken) {
         return await _context.User
-            .Include(u => u.UserRoles)
-            .FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
+            .AnyAsync(u => u.Login == login && u.Id != id, cancellationToken);
+    }
+    
+    public async Task<bool> IsLoginTakenAsync(string login, CancellationToken cancellationToken) {
+        return await _context.User
+            .AnyAsync(u => u.Login == login, cancellationToken);
+    }
+
+    
+    public async Task<string> GetUserPasswordAsync(int id, CancellationToken cancellationToken) {
+        return await _context.User
+            .Where(u => u.Id == id)
+            .Select(u => u.Password)
+            .FirstOrDefaultAsync(cancellationToken);
     }
     
     public async Task<int?> InsertUserAsync(User? user, CancellationToken cancellationToken) {

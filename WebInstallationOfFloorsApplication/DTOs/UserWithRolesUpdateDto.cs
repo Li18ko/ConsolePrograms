@@ -15,9 +15,17 @@ public class UserWithRolesUpdateDto {
     [Required(ErrorMessage = "Логин обязателен")]
     public string Login {get;set;}
     
-    [Required(ErrorMessage = "Пароль обязателен")]
-    [MinLength(6, ErrorMessage = "Пароль должен содержать минимум 6 символов")]
-    public string Password { get; set; }
+    private string _password;
+    
+    public string Password {
+        get => _password;
+        set {
+            if (!string.IsNullOrEmpty(value) && value.Length < 6) {
+                throw new ArgumentException("Пароль должен содержать минимум 6 символов.");
+            }
+            _password = value;
+        }
+    }
     
     [Required(ErrorMessage = "ID чата обязательно")]
     public long ChatId {get;set;}

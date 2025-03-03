@@ -16,7 +16,7 @@ public class UserWithRolesController : ControllerBase {
 
     [HttpGet("List")]
     public async Task<IEnumerable<UserWithRolesGetDto>> GetAllUsersAsync(CancellationToken cancellationToken,
-        [FromQuery] string sort = "nameAsc") {
+        [FromQuery] string sort) {
         return await _userWithRolesService.GetAllUsersAsync(sort, cancellationToken);
     }
 
@@ -25,9 +25,14 @@ public class UserWithRolesController : ControllerBase {
         return await _userWithRolesService.GetUserAsync(id, cancellationToken);
     }
     
-    [HttpGet("checkLogin/{login}")]
-    public async Task<UserWithRolesGetDto> GetUserByLoginAsync(string login, CancellationToken cancellationToken) {
-        return await _userWithRolesService.GetUserByLoginAsync(login, cancellationToken);
+    [HttpGet("isLoginTakenByOtherUser/{id}/{login}")]
+    public async Task<bool> IsLoginTakenByOtherUserAsync(int id, string login, CancellationToken cancellationToken) {
+        return await _userWithRolesService.IsLoginTakenByOtherUserAsync(id, login, cancellationToken);
+    }
+    
+    [HttpGet("IsLoginTakenAsync/{login}")]
+    public async Task<bool> IsLoginTakenAsync(string login, CancellationToken cancellationToken) {
+        return await _userWithRolesService.IsLoginTakenAsync(login, cancellationToken);
     }
 
     [HttpPost]

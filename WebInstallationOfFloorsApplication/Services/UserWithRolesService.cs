@@ -41,21 +41,34 @@ public class UserWithRolesService {
         return _mapper.Map<UserWithRolesGetDto>(user);
     }
     
-    public async Task<UserWithRolesGetDto> GetUserByLoginAsync(string login, CancellationToken cancellationToken) {
+    public async Task<bool> IsLoginTakenByOtherUserAsync(int id, string login, CancellationToken cancellationToken) {
         if (string.IsNullOrEmpty(login)) {
             _logger.Warning("Некорректный логин");
-            return null;
-        }
-        logDebugRequestSuccessful($"получение пользователя по логину = {login}");
-        var user = await _userWithRolesRepository.GetUserByLoginAsync(login, cancellationToken);
-
-        if (user == null) {
-            throw new Exception($"Пользователь с логином = {login} не найден");
+            return false;
         }
         
+        if (id <= 0) {
+            _logger.Warning("Некорректный id");
+            return false;
+        }
+        
+        logDebugRequestSuccessful($"проверку существования логина = {login} не у аккаунта с id = {id}");
+        var user = await _userWithRolesRepository.IsLoginTakenByOtherUserAsync(id, login, cancellationToken);
         logDebugActionSuccessful($"найден c логином = {login}");
 
-        return _mapper.Map<UserWithRolesGetDto>(user);
+        return user;
+    }
+        
+    public async Task<bool> IsLoginTakenAsync(string login, CancellationToken cancellationToken) {
+        if (string.IsNullOrEmpty(login)) {
+            _logger.Warning("Некорректный логин");
+            return false;
+        }
+        logDebugRequestSuccessful($"проверку существования логина = {login}");
+        var user = await _userWithRolesRepository.IsLoginTakenAsync(login, cancellationToken);
+        logDebugActionSuccessful($"найден c логином = {login}");
+
+        return user;
     }
 
     public async Task<int?> InsertUserAsync(UserWithRolesInsertDto dto, CancellationToken cancellationToken) {
@@ -64,8 +77,8 @@ public class UserWithRolesService {
             return null;
         }
         
-        var existingUser = await _userWithRolesRepository.GetUserByLoginAsync(dto.Login, cancellationToken);
-        if (existingUser != null) {
+        var existingUser = await _userWithRolesRepository.IsLoginTakenAsync(dto.Login, cancellationToken);
+        if (existingUser) {
             _logger.Warning("Логин уже существует");
             throw new Exception($"Логин уже существует");
         }
@@ -89,8 +102,8 @@ public class UserWithRolesService {
             return null;
         }
         
-        var existingUser = await _userWithRolesRepository.GetUserByLoginAsync(dto.Login, cancellationToken);
-        if (existingUser != null && existingUser.Id != dto.Id) {
+        var existingUser = await _userWithRolesRepository.IsLoginTakenByOtherUserAsync(dto.Id, dto.Login, cancellationToken);
+        if (existingUser) {
             _logger.Warning("Логин уже существует");
             throw new Exception($"Логин уже существует");
         }
@@ -102,6 +115,10 @@ public class UserWithRolesService {
         }
         
         updatedUser = _mapper.Map(dto, updatedUser);
+        
+        if (string.IsNullOrWhiteSpace(dto.Password)) {
+            updatedUser.Password = await _userWithRolesRepository.GetUserPasswordAsync(dto.Id, cancellationToken);
+        }
         
         foreach (var userRole in updatedUser.UserRoles) {
             userRole.User = updatedUser; 
