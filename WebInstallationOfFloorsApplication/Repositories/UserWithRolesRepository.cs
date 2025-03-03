@@ -45,6 +45,16 @@ public class UserWithRolesRepository {
         return await _context.User
             .AnyAsync(u => u.Login == login, cancellationToken);
     }
+    
+    public async Task<bool> IsEmailTakenByOtherUserAsync(int id, string email, CancellationToken cancellationToken) {
+        return await _context.User
+            .AnyAsync(u => u.Email == email && u.Id != id, cancellationToken);
+    }
+    
+    public async Task<bool> IsEmailTakenAsync(string email, CancellationToken cancellationToken) {
+        return await _context.User
+            .AnyAsync(u => u.Email == email, cancellationToken);
+    }
 
     
     public async Task<string> GetUserPasswordAsync(int id, CancellationToken cancellationToken) {

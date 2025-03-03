@@ -34,6 +34,16 @@ public class UserWithRolesController : ControllerBase {
     public async Task<bool> IsLoginTakenAsync(string login, CancellationToken cancellationToken) {
         return await _userWithRolesService.IsLoginTakenAsync(login, cancellationToken);
     }
+    
+    [HttpGet("isEmailTakenByOtherUser/{id}/{email}")]
+    public async Task<bool> IsEmailTakenByOtherUserAsync(int id, string email, CancellationToken cancellationToken) {
+        return await _userWithRolesService.IsEmailTakenByOtherUserAsync(id, email, cancellationToken);
+    }
+    
+    [HttpGet("IsEmailTakenAsync/{email}")]
+    public async Task<bool> IsEmailTakenAsync(string email, CancellationToken cancellationToken) {
+        return await _userWithRolesService.IsEmailTakenAsync(email, cancellationToken);
+    }
 
     [HttpPost]
     public async Task<int?> InsertUserAsync([FromBody] UserWithRolesInsertDto dto, CancellationToken cancellationToken) {

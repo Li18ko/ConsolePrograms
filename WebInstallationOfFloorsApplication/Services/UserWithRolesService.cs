@@ -53,10 +53,10 @@ public class UserWithRolesService {
         }
         
         logDebugRequestSuccessful($"проверку существования логина = {login} не у аккаунта с id = {id}");
-        var user = await _userWithRolesRepository.IsLoginTakenByOtherUserAsync(id, login, cancellationToken);
+        var existingLogin = await _userWithRolesRepository.IsLoginTakenByOtherUserAsync(id, login, cancellationToken);
         logDebugActionSuccessful($"найден c логином = {login}");
 
-        return user;
+        return existingLogin;
     }
         
     public async Task<bool> IsLoginTakenAsync(string login, CancellationToken cancellationToken) {
@@ -65,10 +65,40 @@ public class UserWithRolesService {
             return false;
         }
         logDebugRequestSuccessful($"проверку существования логина = {login}");
-        var user = await _userWithRolesRepository.IsLoginTakenAsync(login, cancellationToken);
+        var existingLogin = await _userWithRolesRepository.IsLoginTakenAsync(login, cancellationToken);
         logDebugActionSuccessful($"найден c логином = {login}");
 
-        return user;
+        return existingLogin;
+    }
+    
+    public async Task<bool> IsEmailTakenByOtherUserAsync(int id, string email, CancellationToken cancellationToken) {
+        if (string.IsNullOrEmpty(email)) {
+            _logger.Warning("Некорректная почта");
+            return false;
+        }
+        
+        if (id <= 0) {
+            _logger.Warning("Некорректный id");
+            return false;
+        }
+        
+        logDebugRequestSuccessful($"проверку существования почты = {email} не у аккаунта с id = {id}");
+        var existingEmail = await _userWithRolesRepository.IsEmailTakenByOtherUserAsync(id, email, cancellationToken);
+        logDebugActionSuccessful($"найден c почтой = {email}");
+
+        return existingEmail;
+    }
+        
+    public async Task<bool> IsEmailTakenAsync(string email, CancellationToken cancellationToken) {
+        if (string.IsNullOrEmpty(email)) {
+            _logger.Warning("Некорректная почта");
+            return false;
+        }
+        logDebugRequestSuccessful($"проверку существования почты = {email}");
+        var existingEmail = await _userWithRolesRepository.IsEmailTakenAsync(email, cancellationToken);
+        logDebugActionSuccessful($"найден c почтой = {email}");
+
+        return existingEmail;
     }
 
     public async Task<int?> InsertUserAsync(UserWithRolesInsertDto dto, CancellationToken cancellationToken) {
@@ -77,10 +107,16 @@ public class UserWithRolesService {
             return null;
         }
         
-        var existingUser = await _userWithRolesRepository.IsLoginTakenAsync(dto.Login, cancellationToken);
-        if (existingUser) {
+        var existingLogin = await _userWithRolesRepository.IsLoginTakenAsync(dto.Login, cancellationToken);
+        if ( existingLogin) {
             _logger.Warning("Логин уже существует");
             throw new Exception($"Логин уже существует");
+        }
+        
+        var existingEmail = await _userWithRolesRepository.IsEmailTakenAsync(dto.Email, cancellationToken);
+        if (existingEmail) {
+            _logger.Warning("Почта уже существует");
+            throw new Exception($"Почта уже существует");
         }
         
         logDebugRequestSuccessful("добавление нового пользователя");
@@ -102,10 +138,16 @@ public class UserWithRolesService {
             return null;
         }
         
-        var existingUser = await _userWithRolesRepository.IsLoginTakenByOtherUserAsync(dto.Id, dto.Login, cancellationToken);
-        if (existingUser) {
+        var existingLogin = await _userWithRolesRepository.IsLoginTakenByOtherUserAsync(dto.Id, dto.Login, cancellationToken);
+        if (existingLogin) {
             _logger.Warning("Логин уже существует");
             throw new Exception($"Логин уже существует");
+        }
+        
+        var existingEmail = await _userWithRolesRepository.IsEmailTakenByOtherUserAsync(dto.Id, dto.Email, cancellationToken);
+        if (existingEmail) {
+            _logger.Warning("Почта уже существует");
+            throw new Exception($"Почта уже существует");
         }
         
         logDebugRequestSuccessful($"обновление данных о пользователе c id = {dto.Id}");
