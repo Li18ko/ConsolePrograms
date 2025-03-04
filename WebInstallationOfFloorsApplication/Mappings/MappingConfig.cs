@@ -15,7 +15,7 @@ public class MappingConfig: IRegister {
         config.NewConfig<Task, TaskUpdateDto>();
         
         config.NewConfig<User, UserWithRolesGetDto>()
-            .Map(dest => dest.Roles, src => src.UserRoles.Select(ur => ur.RoleId).ToList());
+            .Map(dest => dest.Roles, src => src.UserRoles.Select(ur => ur.Role.Name).ToList());
         
         config.NewConfig<UserWithRolesInsertDto, User>()
             .Map(dest => dest.CreatedAt, src => DateTimeOffset.UtcNow)

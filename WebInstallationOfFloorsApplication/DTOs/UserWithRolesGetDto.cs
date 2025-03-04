@@ -8,5 +8,5 @@ public class UserWithRolesGetDto {
     public long ChatId { get; set; }
     public DateTimeOffset CreatedAt {get;set;}
     public DateTimeOffset LastRevision {get;set;}
-    public List<int> Roles { get; set; }
+    public List<string> Roles { get; set; }
 }

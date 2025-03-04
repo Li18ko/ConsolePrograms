@@ -9,11 +9,16 @@ public class UserWithRolesRepository {
         _context = context;
     }
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync(string sort, CancellationToken cancellationToken) {
+    public async Task<IEnumerable<User>> GetAllUsersAsync(string sort, string filter, CancellationToken cancellationToken) {
         var query = _context.User
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
             .AsQueryable();
+        
+        if (!string.IsNullOrEmpty(filter)) {
+            var roleNames = filter.Split(',').Select(r => r.Trim()).ToList(); 
+            query = query.Where(u => u.UserRoles.Any(ur => roleNames.Contains(ur.Role.Name)));
+        }
 
         query = sort switch {
             "nameAsc" => query.OrderBy(u => u.Name),
@@ -26,13 +31,13 @@ public class UserWithRolesRepository {
             "lastRevisionDesc" => query.OrderByDescending(u => u.LastRevision),
             _ => query.OrderBy(u => u.Name)
         };
-        
         return await query.ToListAsync(cancellationToken);
     }
     
     public async Task<User> GetUserAsync(int id, CancellationToken cancellationToken) {
         return await _context.User
             .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
     

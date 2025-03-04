@@ -16,9 +16,9 @@ public class UserWithRolesService {
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<UserWithRolesGetDto>> GetAllUsersAsync(string sort, CancellationToken cancellationToken) {
+    public async Task<IEnumerable<UserWithRolesGetDto>> GetAllUsersAsync(string sort, string filter, CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка пользователей");
-        var users = await _userWithRolesRepository.GetAllUsersAsync(sort, cancellationToken);
+        var users = await _userWithRolesRepository.GetAllUsersAsync(sort, filter, cancellationToken);
         _logger.Debug($"Найдено пользователей: {users.Count()}");
         
         return users.Select(user => _mapper.Map<UserWithRolesGetDto>(user)).ToList();
