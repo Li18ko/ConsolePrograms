@@ -9,7 +9,7 @@ public class UserWithRolesRepository {
         _context = context;
     }
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync(string sort, string filter, CancellationToken cancellationToken) {
+    public async Task<IEnumerable<User>> GetAllUsersAsync(string sort, string filter, string search, CancellationToken cancellationToken) {
         var query = _context.User
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
@@ -18,6 +18,10 @@ public class UserWithRolesRepository {
         if (!string.IsNullOrEmpty(filter)) {
             var roleNames = filter.Split(',').Select(r => r.Trim()).ToList(); 
             query = query.Where(u => u.UserRoles.Any(ur => roleNames.Contains(ur.Role.Name)));
+        }
+
+        if (!string.IsNullOrEmpty(search)) {
+            query = query.Where(u => u.Name.Contains(search) || u.Email.Contains(search) || u.Login.Contains(search));
         }
 
         query = sort switch {
