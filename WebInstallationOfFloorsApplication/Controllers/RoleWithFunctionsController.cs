@@ -36,5 +36,10 @@ public class RoleWithFunctionsController: ControllerBase {
     public async System.Threading.Tasks.Task DeleteRoleAsync(int id, CancellationToken cancellationToken) {
         await _roleWithFunctionsService.DeleteRoleAsync(id, cancellationToken);
     }
+    
+    [HttpGet("ListFunctions")]
+    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(CancellationToken cancellationToken) {
+        return await _roleWithFunctionsService.GetAllFunctionsAsync(cancellationToken);
+    }
 
 }

@@ -45,4 +45,8 @@ public class RoleWithFunctionsRepository {
             .AnyAsync(ur => ur.RoleId == id, cancellationToken); 
     }
     
+    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(CancellationToken cancellationToken) {
+        return await _context.Function.ToListAsync(cancellationToken);
+    }
+    
 }
