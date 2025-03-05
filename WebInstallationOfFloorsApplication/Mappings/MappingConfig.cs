@@ -39,5 +39,27 @@ public class MappingConfig: IRegister {
                 RoleId = roleId, 
                 User = null
             }).ToList());
+        
+        config.NewConfig<Role, RoleWithFunctionsGetDto>()
+            .Map(dest => dest.Functions, src => src.RoleFunctions.Select(rf => new FunctionDto {
+                Id = rf.Function.Id,
+                Code = rf.Function.Code,
+                Name = rf.Function.Name
+            }).ToList());
+        
+        config.NewConfig<Function, FunctionDto>();
+        
+        config.NewConfig<RoleWithFunctionsInsertDto, Role>()
+            .Map(dest => dest.RoleFunctions, src => src.FunctionIds.Select(fid => new RoleFunction {
+                FunctionId = fid
+            }).ToList());
+        
+        config.NewConfig<RoleWithFunctionsUpdateDto, Role>()
+            .Map(dest => dest.RoleFunctions, src => src.FunctionIds.Select(fid => new RoleFunction {
+                FunctionId = fid
+            }).ToList());
+        
+        config.NewConfig<Role, RoleWithFunctionsUpdateDto>()
+            .Map(dest => dest.FunctionIds, src => src.RoleFunctions.Select(rf => rf.FunctionId).ToList());
     }
 }

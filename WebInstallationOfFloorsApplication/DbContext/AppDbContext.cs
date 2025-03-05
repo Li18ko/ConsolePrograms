@@ -10,6 +10,8 @@ public class AppDbContext: DbContext {
     public DbSet<Task> Task { get; set; }
     public DbSet<Role> Role { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
+    public DbSet<Function> Function { get; set; }
+    public DbSet<RoleFunction> RoleFunction { get; set; }
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {
     }
@@ -28,9 +30,29 @@ public class AppDbContext: DbContext {
             .HasConversion<string>();
         
         modelBuilder.Entity<Role>().HasData(
-            new Role { Id = 1, Name = "Admin" },
-            new Role { Id = 2, Name = "Worker" },
-            new Role { Id = 3, Name = "Manager" }
+            new Role { Id = 1, Name = "Admin", Active = true},
+            new Role { Id = 2, Name = "Worker", Active = true },
+            new Role { Id = 3, Name = "Manager", Active = true }
+        );
+
+        modelBuilder.Entity<Function>().HasData(
+            new Function { Id = 1, Code = "UserList", Name = "Чтение пользователей"},
+            new Function { Id = 2, Code = "User", Name = "Чтение пользователя"},
+            new Function { Id = 3, Code = "UserEdit", Name = "Редактирование пользователя"},
+            new Function { Id = 4, Code = "UserDelete", Name = "Удаление пользователя"},
+            new Function { Id = 5, Code = "UserAdd", Name = "Добавление пользователя"},
+            
+            new Function { Id = 6, Code = "TaskList", Name = "Чтение задач"},
+            new Function { Id = 7, Code = "Task", Name = "Чтение задач"},
+            new Function { Id = 8, Code = "TaskEdit", Name = "Редактирование задачи"},
+            new Function { Id = 9, Code = "TaskDelete", Name = "Удаление задачи"},
+            new Function { Id = 10, Code = "TaskAdd", Name = "Добавление задачи"},
+            
+            new Function { Id = 11, Code = "RoleList", Name = "Чтение ролей"},
+            new Function { Id = 12, Code = "Role", Name = "Чтение роли"},
+            new Function { Id = 13, Code = "RoleEdit", Name = "Редактирование роли"},
+            new Function { Id = 14, Code = "RoleDelete", Name = "Удаление роли"},
+            new Function { Id = 15, Code = "RoleAdd", Name = "Добавление роли"}
         );
 
         modelBuilder.Entity<User>().HasData(
@@ -89,6 +111,19 @@ public class AppDbContext: DbContext {
             }
         );
         
+        modelBuilder.Entity<User>().HasData(
+            new User {
+                Id = 13, 
+                Name = "SUPER_ADMIN",
+                Email = $"ADMIN@example.com",
+                Login = "SUPER_ADMIN",
+                Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("SUPER_ADMIN"))),
+                ChatId = 0,
+                CreatedAt = DateTimeOffset.UtcNow,
+                LastRevision = DateTimeOffset.UtcNow
+            }
+        );
+        
         
         modelBuilder.Entity<UserRole>().HasKey(ur => new { ur.UserId, ur.RoleId });
         
@@ -109,6 +144,37 @@ public class AppDbContext: DbContext {
                 return new UserRole {
                     UserId = i + 10,
                     RoleId = 3
+                };
+            }).ToArray()
+        );
+        
+        modelBuilder.Entity<RoleFunction>().HasKey(rf => new { rf.RoleId, rf.FunctionId });
+        modelBuilder.Entity<RoleFunction>().HasOne(rf => rf.Role).WithMany(r => r.RoleFunctions).HasForeignKey(rf => rf.RoleId);
+        modelBuilder.Entity<RoleFunction>().HasOne(rf => rf.Function).WithMany(f => f.RoleFunctions).HasForeignKey(rf => rf.FunctionId);
+
+        modelBuilder.Entity<RoleFunction>().HasData(
+            Enumerable.Range(1, 15).Select(i => {
+                return new RoleFunction {
+                    RoleId = 1,
+                    FunctionId = i
+                };
+            }).ToArray()
+        );
+        
+        modelBuilder.Entity<RoleFunction>().HasData(
+            Enumerable.Range(1, 15).Select(i => {
+                return new RoleFunction {
+                    RoleId = 3,
+                    FunctionId = i
+                };
+            }).ToArray()
+        );
+
+        modelBuilder.Entity<RoleFunction>().HasData(
+            Enumerable.Range(1, 6).Select(i => {
+                return new RoleFunction {
+                    RoleId = 2,
+                    FunctionId = i + 1
                 };
             }).ToArray()
         );

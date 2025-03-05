@@ -1,9 +1,9 @@
 namespace WebInstallationOfFloorsApplication;
 
-public class UserRole {
-    public int UserId { get; set; }
-    public User User { get; set; }
-
+public class RoleFunction {
     public int RoleId { get; set; }
     public Role Role { get; set; }
+
+    public int FunctionId { get; set; }
+    public Function Function { get; set; }
 }

@@ -58,6 +58,9 @@ namespace WebInstallationOfFloorsApplication {
             builder.Services.AddScoped<UserWithRolesRepository>();
             builder.Services.AddScoped<UserWithRolesService>();
             
+            builder.Services.AddScoped<RoleWithFunctionsRepository>();
+            builder.Services.AddScoped<RoleWithFunctionsService>();
+            
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<TelegramService>(sp => {
                 var taskRepository = sp.GetRequiredService<TaskRepository>();
