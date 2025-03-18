@@ -55,11 +55,11 @@ namespace WebInstallationOfFloorsApplication {
             builder.Services.AddScoped<TaskRepository>();
             builder.Services.AddScoped<TaskService>();
             
-            builder.Services.AddScoped<UserWithRolesRepository>();
-            builder.Services.AddScoped<UserWithRolesService>();
+            builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<UserService>();
             
-            builder.Services.AddScoped<RoleWithFunctionsRepository>();
-            builder.Services.AddScoped<RoleWithFunctionsService>();
+            builder.Services.AddScoped<RoleRepository>();
+            builder.Services.AddScoped<RoleService>();
             
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<TelegramService>(sp => {

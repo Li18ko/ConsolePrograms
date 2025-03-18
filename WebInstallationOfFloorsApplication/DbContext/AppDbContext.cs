@@ -30,9 +30,11 @@ public class AppDbContext: DbContext {
             .HasConversion<string>();
         
         modelBuilder.Entity<Role>().HasData(
-            new Role { Id = 1, Name = "Admin", Active = true},
-            new Role { Id = 2, Name = "Worker", Active = true },
-            new Role { Id = 3, Name = "Manager", Active = true }
+            new Role { Id = 1, Name = "Admin", Description = "Имеет все права", Active = true},
+            new Role { Id = 2, Name = "Worker", Description = "Обычный работник. Имеет права на добавление/редактирование" +
+                                                              "/удаление/просмотр аккаунта и чтение выданных задач", Active = true },
+            new Role { Id = 3, Name = "Manager", Description = "Менеджер имеет право добавлять/изменять/удалять/" +
+                                                               "просматривать аккаунты/задачи и просматривать роли", Active = true }
         );
 
         modelBuilder.Entity<Function>().HasData(
@@ -42,8 +44,8 @@ public class AppDbContext: DbContext {
             new Function { Id = 4, Code = "UserDelete", Name = "Удаление пользователя"},
             new Function { Id = 5, Code = "UserAdd", Name = "Добавление пользователя"},
             
-            new Function { Id = 6, Code = "TaskList", Name = "Чтение задач"},
-            new Function { Id = 7, Code = "Task", Name = "Чтение задач"},
+            new Function { Id = 6, Code = "TaskList", Name = "Чтение всех задач"},
+            new Function { Id = 7, Code = "Task", Name = "Чтение задачи"},
             new Function { Id = 8, Code = "TaskEdit", Name = "Редактирование задачи"},
             new Function { Id = 9, Code = "TaskDelete", Name = "Удаление задачи"},
             new Function { Id = 10, Code = "TaskAdd", Name = "Добавление задачи"},
@@ -118,7 +120,7 @@ public class AppDbContext: DbContext {
                 Email = $"ADMIN@example.com",
                 Login = "SUPER_ADMIN",
                 Password = Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes("SUPER_ADMIN"))),
-                ChatId = 0,
+                ChatId = -9999999999,
                 CreatedAt = DateTimeOffset.UtcNow,
                 LastRevision = DateTimeOffset.UtcNow
             }
@@ -148,6 +150,13 @@ public class AppDbContext: DbContext {
             }).ToArray()
         );
         
+        modelBuilder.Entity<UserRole>().HasData(
+            new UserRole {
+                UserId = 13,
+                RoleId = 1
+            }
+        );
+        
         modelBuilder.Entity<RoleFunction>().HasKey(rf => new { rf.RoleId, rf.FunctionId });
         modelBuilder.Entity<RoleFunction>().HasOne(rf => rf.Role).WithMany(r => r.RoleFunctions).HasForeignKey(rf => rf.RoleId);
         modelBuilder.Entity<RoleFunction>().HasOne(rf => rf.Function).WithMany(f => f.RoleFunctions).HasForeignKey(rf => rf.FunctionId);
@@ -162,7 +171,7 @@ public class AppDbContext: DbContext {
         );
         
         modelBuilder.Entity<RoleFunction>().HasData(
-            Enumerable.Range(1, 15).Select(i => {
+            Enumerable.Range(1, 12).Select(i => {
                 return new RoleFunction {
                     RoleId = 3,
                     FunctionId = i

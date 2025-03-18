@@ -14,10 +14,10 @@ public class MappingConfig: IRegister {
         config.NewConfig<TaskUpdateDto, Task>();
         config.NewConfig<Task, TaskUpdateDto>();
         
-        config.NewConfig<User, UserWithRolesGetDto>()
+        config.NewConfig<User, UserGetDto>()
             .Map(dest => dest.Roles, src => src.UserRoles.Select(ur => ur.Role.Name).ToList());
         
-        config.NewConfig<UserWithRolesInsertDto, User>()
+        config.NewConfig<UserInsertDto, User>()
             .Map(dest => dest.CreatedAt, src => DateTimeOffset.UtcNow)
             .Map(dest => dest.LastRevision, src => DateTimeOffset.UtcNow)
             .Map(dest => dest.Password, src => 
@@ -27,11 +27,11 @@ public class MappingConfig: IRegister {
                 User = null
             }).ToList());
         
-        config.NewConfig<User, UserWithRolesUpdateDto>()
+        config.NewConfig<User, UserUpdateDto>()
             .Map(dest => dest.RoleIds, src => src.UserRoles.Select(ur => ur.RoleId).ToList())
             .Map(dest => dest.Password, src => "******");
 
-        config.NewConfig<UserWithRolesUpdateDto, User>()
+        config.NewConfig<UserUpdateDto, User>()
             .Map(dest => dest.LastRevision, src => DateTimeOffset.UtcNow)
             .Map(dest => dest.Password, src => 
                 Convert.ToHexString(SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(src.Password))))
@@ -40,7 +40,7 @@ public class MappingConfig: IRegister {
                 User = null
             }).ToList());
         
-        config.NewConfig<Role, RoleWithFunctionsGetDto>()
+        config.NewConfig<Role, RoleGetDto>()
             .Map(dest => dest.Functions, src => src.RoleFunctions.Select(rf => new FunctionDto {
                 Id = rf.Function.Id,
                 Code = rf.Function.Code,
@@ -49,17 +49,17 @@ public class MappingConfig: IRegister {
         
         config.NewConfig<Function, FunctionDto>();
         
-        config.NewConfig<RoleWithFunctionsInsertDto, Role>()
+        config.NewConfig<RoleInsertDto, Role>()
             .Map(dest => dest.RoleFunctions, src => src.FunctionIds.Select(fid => new RoleFunction {
                 FunctionId = fid
             }).ToList());
         
-        config.NewConfig<RoleWithFunctionsUpdateDto, Role>()
+        config.NewConfig<RoleUpdateDto, Role>()
             .Map(dest => dest.RoleFunctions, src => src.FunctionIds.Select(fid => new RoleFunction {
                 FunctionId = fid
             }).ToList());
         
-        config.NewConfig<Role, RoleWithFunctionsUpdateDto>()
+        config.NewConfig<Role, RoleUpdateDto>()
             .Map(dest => dest.FunctionIds, src => src.RoleFunctions.Select(rf => rf.FunctionId).ToList());
     }
 }

@@ -3,46 +3,46 @@ using MapsterMapper;
 
 namespace WebInstallationOfFloorsApplication;
 
-public class RoleWithFunctionsService {
+public class RoleService {
     private readonly Logger _logger;
-    private readonly RoleWithFunctionsRepository _roleWithFunctionsRepository;
+    private readonly RoleRepository _roleRepository;
     private readonly IMapper _mapper;
 
-    public RoleWithFunctionsService(Logger logger, RoleWithFunctionsRepository roleWithFunctionsRepository, IMapper mapper) {
+    public RoleService(Logger logger, RoleRepository roleRepository, IMapper mapper) {
         _logger = logger;
-        _roleWithFunctionsRepository = roleWithFunctionsRepository;
+        _roleRepository = roleRepository;
         _mapper = mapper;
     }
     
-    public async Task<IEnumerable<RoleWithFunctionsGetDto>> GetAllRolesAsync(CancellationToken cancellationToken) {
+    public async Task<IEnumerable<RoleGetDto>> GetAllRolesAsync(IEnumerable<bool>? status, CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка ролей и функций");
-        var roles = await _roleWithFunctionsRepository.GetAllRolesAsync(cancellationToken);
+        var roles = await _roleRepository.GetAllRolesAsync(status, cancellationToken);
         _logger.Debug($"Найдено ролей: {roles.Count()}");
         
-        var rolesDto = roles.Select(role => _mapper.Map<RoleWithFunctionsGetDto>(role)).ToList();
+        var rolesDto = roles.Select(role => _mapper.Map<RoleGetDto>(role)).ToList();
         
         return rolesDto;
     }
     
-    public async Task<RoleWithFunctionsGetDto> GetRoleAsync(int id, CancellationToken cancellationToken) {
+    public async Task<RoleGetDto> GetRoleAsync(int id, CancellationToken cancellationToken) {
         if (id <= 0){
             _logger.Warning("Некорректный id");
             return null;
         }
         logDebugRequestSuccessful($"получение роли по id = {id}");
-        var role = await _roleWithFunctionsRepository.GetRoleAsync(id, cancellationToken);
+        var role = await _roleRepository.GetRoleAsync(id, cancellationToken);
 
         if (role == null) {
             throw new Exception($"Роль с id = {id} не найдена");
         }
         logDebugActionSuccessful($"найдена c id = {id}");
         
-        var roleDto = _mapper.Map<RoleWithFunctionsGetDto>(role);
+        var roleDto = _mapper.Map<RoleGetDto>(role);
         
         return roleDto;
     }
     
-    public async Task<int?> InsertRoleAsync(RoleWithFunctionsInsertDto dto, CancellationToken cancellationToken) {
+    public async Task<int?> InsertRoleAsync(RoleInsertDto dto, CancellationToken cancellationToken) {
         if (dto == null) {
             _logger.Warning("Некорректные данные роли в запросе на добавление");
             return null;
@@ -52,29 +52,29 @@ public class RoleWithFunctionsService {
         
         var role = _mapper.Map<Role>(dto);
         
-        var insertRole = await _roleWithFunctionsRepository.InsertRoleAsync(role, cancellationToken);
+        var insertRole = await _roleRepository.InsertRoleAsync(role, cancellationToken);
         logDebugActionSuccessful("добавлена");
         return insertRole;
     }
     
-    public async Task<RoleWithFunctionsUpdateDto> UpdateRoleAsync(RoleWithFunctionsUpdateDto dto, CancellationToken cancellationToken) {
+    public async Task<RoleUpdateDto> UpdateRoleAsync(RoleUpdateDto dto, CancellationToken cancellationToken) {
         if (dto == null || dto.Id <= 0) {
             _logger.Warning("Некорректные данные роли в запросе на обновление");
             return null;
         }
         
         logDebugRequestSuccessful($"обновление данных о роль c id = {dto.Id}");
-        var updatedRole = await _roleWithFunctionsRepository.GetRoleAsync(dto.Id, cancellationToken);
+        var updatedRole = await _roleRepository.GetRoleAsync(dto.Id, cancellationToken);
         if (updatedRole == null) {
             throw new Exception($"Роль с id = {dto.Id} не найдена");
         }
         
         updatedRole = _mapper.Map(dto, updatedRole);
         
-        await _roleWithFunctionsRepository.UpdateRoleAsync(updatedRole, cancellationToken);
+        await _roleRepository.UpdateRoleAsync(updatedRole, cancellationToken);
         logDebugActionSuccessful($"найден c id = {dto.Id}");
         
-        return _mapper.Map<RoleWithFunctionsUpdateDto>(updatedRole);
+        return _mapper.Map<RoleUpdateDto>(updatedRole);
     }
     
     public async System.Threading.Tasks.Task DeleteRoleAsync(int id, CancellationToken cancellationToken) {
@@ -82,23 +82,23 @@ public class RoleWithFunctionsService {
             throw new Exception("id должен быть больше нуля");
         }
         logDebugRequestSuccessful($"удаление данных о роли c id = {id}");
-        var deleteRole = await _roleWithFunctionsRepository.GetRoleAsync(id, cancellationToken);
+        var deleteRole = await _roleRepository.GetRoleAsync(id, cancellationToken);
         if (deleteRole == null) {
             throw new Exception($"Роль с id = {id} не найдена");
         }
         
-        bool isInUse = await _roleWithFunctionsRepository.IsRoleInUseAsync(id, cancellationToken);
+        bool isInUse = await _roleRepository.IsRoleInUseAsync(id, cancellationToken);
         if (isInUse) {
             throw new Exception($"Роль используется и не может быть удалена");
         }
             
-        await _roleWithFunctionsRepository.DeleteRoleAsync(id, cancellationToken);
+        await _roleRepository.DeleteRoleAsync(id, cancellationToken);
         logDebugActionSuccessful($"удален c id = {id}");
     }
     
     public async Task<IEnumerable<Function>> GetAllFunctionsAsync(CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка функций");
-        var functions = await _roleWithFunctionsRepository.GetAllFunctionsAsync(cancellationToken);
+        var functions = await _roleRepository.GetAllFunctionsAsync(cancellationToken);
         _logger.Debug($"Найдено функций: {functions.Count()}");
         
         return functions;

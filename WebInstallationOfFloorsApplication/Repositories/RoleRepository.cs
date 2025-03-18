@@ -2,19 +2,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebInstallationOfFloorsApplication;
 
-public class RoleWithFunctionsRepository {
+public class RoleRepository {
     private readonly AppDbContext _context;
-    public RoleWithFunctionsRepository(AppDbContext context) {
+    public RoleRepository(AppDbContext context) {
         _context = context;
     }
     
-    public async Task<IEnumerable<Role>> GetAllRolesAsync(CancellationToken cancellationToken) {
-        return await _context.Role
+    public async Task<IEnumerable<Role>> GetAllRolesAsync(IEnumerable<bool>? status, CancellationToken cancellationToken) {
+        var query =  _context.Role
             .Include(rf => rf.RoleFunctions) 
             .ThenInclude(f => f.Function) 
-            .ToListAsync(cancellationToken);
+            .AsQueryable();
+        
+        if (status != null && status.Any()) {
+            query = query.Where(r => status.Contains(r.Active));
+        }    
+        
+        return await query.ToListAsync(cancellationToken);
     }
 
+    
     public async Task<Role> GetRoleAsync(int id, CancellationToken cancellationToken) {
         return await _context.Role
             .Include(rf => rf.RoleFunctions)
