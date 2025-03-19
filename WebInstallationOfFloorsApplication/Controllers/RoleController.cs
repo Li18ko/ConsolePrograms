@@ -13,8 +13,11 @@ public class RoleController: ControllerBase {
     }
     
     [HttpGet("List")]
-    public async Task<IEnumerable<RoleGetDto>> GetAllRolesAsync(CancellationToken cancellationToken, [FromQuery] IEnumerable<bool>? status = null) {
-        return await _roleService.GetAllRolesAsync(status, cancellationToken);
+    public async Task<PagedResult<RoleGetDto>> GetAllRolesAsync(CancellationToken cancellationToken, 
+        [FromQuery] IEnumerable<bool>? status = null,
+        [FromQuery] int skip = 0, 
+        [FromQuery] int take = 10) {
+        return await _roleService.GetAllRolesAsync(status, skip, take, cancellationToken);
     }
 
     [HttpGet("{id}")]

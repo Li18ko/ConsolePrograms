@@ -4,11 +4,13 @@ namespace WebInstallationOfFloorsApplication;
 
 public class RoleRepository {
     private readonly AppDbContext _context;
+
     public RoleRepository(AppDbContext context) {
         _context = context;
     }
-    
-    public async Task<IEnumerable<Role>> GetAllRolesAsync(IEnumerable<bool>? status, CancellationToken cancellationToken) {
+
+    public async Task<(IEnumerable<Role> Roles, int TotalCount)> GetAllRolesAsync(IEnumerable<bool>? status, 
+        int skip, int take, CancellationToken cancellationToken) {
         var query =  _context.Role
             .Include(rf => rf.RoleFunctions) 
             .ThenInclude(f => f.Function) 
@@ -18,7 +20,11 @@ public class RoleRepository {
             query = query.Where(r => status.Contains(r.Active));
         }    
         
-        return await query.ToListAsync(cancellationToken);
+        var totalCount = await query.CountAsync(cancellationToken);
+        
+        var roles = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+        
+        return (roles, totalCount);
     }
 
     

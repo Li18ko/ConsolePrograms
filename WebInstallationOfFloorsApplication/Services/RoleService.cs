@@ -14,14 +14,19 @@ public class RoleService {
         _mapper = mapper;
     }
     
-    public async Task<IEnumerable<RoleGetDto>> GetAllRolesAsync(IEnumerable<bool>? status, CancellationToken cancellationToken) {
+    public async Task<PagedResult<RoleGetDto>> GetAllRolesAsync(IEnumerable<bool>? status, 
+        int skip, int take,CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка ролей и функций");
-        var roles = await _roleRepository.GetAllRolesAsync(status, cancellationToken);
+        var (roles, totalCount) = await _roleRepository.GetAllRolesAsync(status, skip, take, cancellationToken);
         _logger.Debug($"Найдено ролей: {roles.Count()}");
         
         var rolesDto = roles.Select(role => _mapper.Map<RoleGetDto>(role)).ToList();
         
-        return rolesDto;
+        
+        return new PagedResult<RoleGetDto>{
+            Count = totalCount,
+            Items = rolesDto.ToList()
+        };
     }
     
     public async Task<RoleGetDto> GetRoleAsync(int id, CancellationToken cancellationToken) {
