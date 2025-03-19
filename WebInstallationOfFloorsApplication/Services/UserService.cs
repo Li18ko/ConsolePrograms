@@ -17,13 +17,19 @@ public class UserService {
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<UserGetDto>> GetAllUsersAsync(string sort, string order, IEnumerable<int>? filter, string search,
+    public async Task<PagedResult<UserGetDto>> GetAllUsersAsync(string sort, string order, IEnumerable<int>? filter, 
+        string search, int skip, int take,
         CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка пользователей");
-        var users = await _userRepository.GetAllUsersAsync(sort, order, filter, search, cancellationToken);
+        var (users, totalCount) = await _userRepository.GetAllUsersAsync(sort, order, filter, search, skip, take, cancellationToken);
         _logger.Debug($"Найдено пользователей: {users.Count()}");
         
-        return users.Select(user => _mapper.Map<UserGetDto>(user)).ToList();
+        var userDtos = users.Select(user => _mapper.Map<UserGetDto>(user)).ToList();
+        
+        return new PagedResult<UserGetDto>{
+            Count = totalCount,
+            Items = userDtos.ToList()
+        };
     }
 
     public async Task<UserGetDto> GetUserAsync(int id, CancellationToken cancellationToken) {

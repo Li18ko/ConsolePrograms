@@ -11,8 +11,8 @@ public class UserRepository {
         _context = context;
     }
 
-    public async Task<IEnumerable<User>> GetAllUsersAsync(string sort, string order, 
-        IEnumerable<int>? filter, string search, CancellationToken cancellationToken) {
+    public async Task<(IEnumerable<User> Users, int TotalCount)> GetAllUsersAsync(string sort, string order, 
+        IEnumerable<int>? filter, string search, int skip, int take, CancellationToken cancellationToken) {
         var query = _context.User
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
@@ -46,7 +46,11 @@ public class UserRepository {
             query = query.OrderByDescending(u => u.LastRevision);
         }
         
-        return await query.ToListAsync(cancellationToken);
+        var totalCount = await query.CountAsync(cancellationToken);
+        
+        var users = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+        
+        return (users, totalCount);
     }
     
     public async Task<User> GetUserAsync(int id, CancellationToken cancellationToken) {
