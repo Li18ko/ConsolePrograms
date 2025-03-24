@@ -19,6 +19,11 @@ public class RoleController: ControllerBase {
         [FromQuery] int take = 10) {
         return await _roleService.GetAllRolesAsync(status, skip, take, cancellationToken);
     }
+    
+    [HttpGet("ListWithoutSorting")]
+    public async Task<IEnumerable<RoleGetDto>> GetAllRolesToSortAsync(CancellationToken cancellationToken) {
+        return await _roleService.GetAllRolesWithoutSortingAsync(cancellationToken);
+    }
 
     [HttpGet("{id}")]
     public async Task<RoleGetDto> GetRoleAsync(int id, CancellationToken cancellationToken) {

@@ -53,6 +53,15 @@ public class UserRepository {
         return (users, totalCount);
     }
     
+    public async Task<IEnumerable<User>> GetAllUsersWithoutSortingAsync(CancellationToken cancellationToken) {
+        var users = await _context.User
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .ToListAsync(cancellationToken);
+        
+        return users;
+    }
+    
     public async Task<User> GetUserAsync(int id, CancellationToken cancellationToken) {
         return await _context.User
             .Include(u => u.UserRoles)

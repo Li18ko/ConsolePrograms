@@ -28,8 +28,18 @@ public class UserService {
         
         return new PagedResult<UserGetDto>{
             Count = totalCount,
-            Items = userDtos.ToList()
+            Items = userDtos
         };
+    }
+    
+    public async Task<IEnumerable<UserGetDto>> GetAllUsersWithoutSortingAsync(CancellationToken cancellationToken) {
+        logDebugRequestSuccessful("получение списка пользователей");
+        var users = await _userRepository.GetAllUsersWithoutSortingAsync(cancellationToken);
+        _logger.Debug($"Найдено пользователей: {users.Count()}");
+        
+        var userDtos = users.Select(user => _mapper.Map<UserGetDto>(user)).ToList();
+
+        return userDtos;
     }
 
     public async Task<UserGetDto> GetUserAsync(int id, CancellationToken cancellationToken) {

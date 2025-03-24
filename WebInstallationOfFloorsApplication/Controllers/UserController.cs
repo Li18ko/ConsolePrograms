@@ -26,6 +26,11 @@ public class UserController : ControllerBase {
         return await _userService.GetAllUsersAsync(sort, order, filter, search, skip, take, cancellationToken);
     }
 
+    [HttpGet("ListWithoutSorting")]
+    public async Task<IEnumerable<UserGetDto>> GetAllUsersWithoutSortingAsync(CancellationToken cancellationToken) {
+        return await _userService.GetAllUsersWithoutSortingAsync(cancellationToken);
+    }
+
     [HttpGet("{id}")]
     public async Task<UserGetDto> GetUserAsync(int id, CancellationToken cancellationToken) {
         return await _userService.GetUserAsync(id, cancellationToken);

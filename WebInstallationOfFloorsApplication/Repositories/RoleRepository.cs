@@ -26,6 +26,15 @@ public class RoleRepository {
         
         return (roles, totalCount);
     }
+    
+    public async Task<IEnumerable<Role>> GetAllRolesWithoutSortingAsync(CancellationToken cancellationToken) {
+        var roles =  await _context.Role
+            .Include(rf => rf.RoleFunctions) 
+            .ThenInclude(f => f.Function) 
+            .ToListAsync(cancellationToken);
+        
+        return roles;
+    }
 
     
     public async Task<Role> GetRoleAsync(int id, CancellationToken cancellationToken) {

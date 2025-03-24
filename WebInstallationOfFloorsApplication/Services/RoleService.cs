@@ -22,11 +22,20 @@ public class RoleService {
         
         var rolesDto = roles.Select(role => _mapper.Map<RoleGetDto>(role)).ToList();
         
-        
         return new PagedResult<RoleGetDto>{
             Count = totalCount,
-            Items = rolesDto.ToList()
+            Items = rolesDto
         };
+    }
+    
+    public async Task<IEnumerable<RoleGetDto>> GetAllRolesWithoutSortingAsync(CancellationToken cancellationToken) {
+        logDebugRequestSuccessful("получение списка ролей и функций");
+        var roles = await _roleRepository.GetAllRolesWithoutSortingAsync(cancellationToken);
+        _logger.Debug($"Найдено ролей: {roles.Count()}");
+        
+        var rolesDto = roles.Select(role => _mapper.Map<RoleGetDto>(role)).ToList();
+
+        return rolesDto;
     }
     
     public async Task<RoleGetDto> GetRoleAsync(int id, CancellationToken cancellationToken) {
