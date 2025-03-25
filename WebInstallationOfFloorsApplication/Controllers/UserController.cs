@@ -16,14 +16,9 @@ public class UserController : ControllerBase {
 
     [HttpGet("List")]
     public async Task<PagedResult<UserGetDto>> GetAllUsersAsync(CancellationToken cancellationToken,
-        [FromQuery] string sort, 
-        [FromQuery] string order, 
-        [FromQuery] IEnumerable<int>? filter = null, 
-        [FromQuery] string search = "",
-        [FromQuery] int skip = 0, 
-        [FromQuery] int take = 10) {
+        [FromQuery] UserFilterDto filter) {
         
-        return await _userService.GetAllUsersAsync(sort, order, filter, search, skip, take, cancellationToken);
+        return await _userService.GetAllUsersAsync(filter, cancellationToken);
     }
 
     [HttpGet("ListWithoutSorting")]

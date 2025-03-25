@@ -11,44 +11,39 @@ public class UserRepository {
         _context = context;
     }
 
-    public async Task<(IEnumerable<User> Users, int TotalCount)> GetAllUsersAsync(string sort, string order, 
-        IEnumerable<int>? filter, string search, int skip, int take, CancellationToken cancellationToken) {
+    public async Task<(IEnumerable<User> Users, int TotalCount)> GetAllUsersAsync(UserFilterDto filter, CancellationToken cancellationToken) {
         var query = _context.User
             .Include(u => u.UserRoles)
             .ThenInclude(ur => ur.Role)
             .AsQueryable();
         
-        if (filter != null && filter.Any()) {
-            query = query.Where(u => u.UserRoles.Any(ur => filter.Contains(ur.Role.Id)));
+        if (filter.Filter != null && filter.Filter.Any()) {
+            query = query.Where(u => u.UserRoles.Any(ur => filter.Filter.Contains(ur.Role.Id)));
         }
         
-        if (!string.IsNullOrEmpty(search)) {
-            query = query.Where(u => u.Name.Contains(search) || u.Email.Contains(search) || u.Login.Contains(search));
+        if (!string.IsNullOrEmpty(filter.Search)) {
+            query = query.Where(u => u.Name.Contains(filter.Search) || 
+                                     u.Email.Contains(filter.Search) || 
+                                     u.Login.Contains(filter.Search));
         }
         
-        if (!string.IsNullOrEmpty(sort)) {
-            var parameter = Expression.Parameter(typeof(User), "u");
-            var property = Expression.Property(parameter, sort);    
-            var lambda = Expression.Lambda(property, parameter);
+        var parameter = Expression.Parameter(typeof(User), "u");
+        var property = Expression.Property(parameter, filter.Sort);    
+        var lambda = Expression.Lambda(property, parameter);
+        
+        var methodName = filter.Order.ToLower() == "desc" ? "OrderByDescending" : "OrderBy";
+        var resultExpression = Expression.Call(
+            typeof(Queryable),
+            methodName,
+            new[] { typeof(User), property.Type },
+            query.Expression,
+            Expression.Quote(lambda)
+        );
 
-            var methodName = order?.ToLower() == "desc" ? "OrderByDescending" : "OrderBy";
-            var resultExpression = Expression.Call(
-                typeof(Queryable),
-                methodName,
-                new[] { typeof(User), property.Type },
-                query.Expression,
-                Expression.Quote(lambda)
-            );
-
-            query = query.Provider.CreateQuery<User>(resultExpression);
-        }
-        else {
-            query = query.OrderByDescending(u => u.LastRevision);
-        }
+        query = query.Provider.CreateQuery<User>(resultExpression);
         
         var totalCount = await query.CountAsync(cancellationToken);
-        
-        var users = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+        var users = await query.Skip(filter.Skip).Take(filter.Take).ToListAsync(cancellationToken);
         
         return (users, totalCount);
     }

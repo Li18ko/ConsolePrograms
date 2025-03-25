@@ -9,20 +9,19 @@ public class RoleRepository {
         _context = context;
     }
 
-    public async Task<(IEnumerable<Role> Roles, int TotalCount)> GetAllRolesAsync(IEnumerable<bool>? status, 
-        int skip, int take, CancellationToken cancellationToken) {
+    public async Task<(IEnumerable<Role> Roles, int TotalCount)> GetAllRolesAsync(RoleFilterDto filter, CancellationToken cancellationToken) {
         var query =  _context.Role
             .Include(rf => rf.RoleFunctions) 
             .ThenInclude(f => f.Function) 
             .AsQueryable();
         
-        if (status != null && status.Any()) {
-            query = query.Where(r => status.Contains(r.Active));
+        if (filter.Status != null && filter.Status.Any()) {
+            query = query.Where(r => filter.Status.Contains(r.Active));
         }    
         
         var totalCount = await query.CountAsync(cancellationToken);
         
-        var roles = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+        var roles = await query.Skip(filter.Skip).Take(filter.Take).ToListAsync(cancellationToken);
         
         return (roles, totalCount);
     }
@@ -67,10 +66,10 @@ public class RoleRepository {
             .AnyAsync(ur => ur.RoleId == id, cancellationToken); 
     }
     
-    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(string sort, CancellationToken cancellationToken) {
+    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(FunctionFilterDto filter, CancellationToken cancellationToken) {
         var functions = await _context.Function.ToListAsync(cancellationToken);
 
-        var sortedFunctions = sort == "asc"
+        var sortedFunctions = filter.Order == "asc"
             ? functions.OrderBy(f => f.Order) 
             : functions.OrderByDescending(f => f.Order); 
 

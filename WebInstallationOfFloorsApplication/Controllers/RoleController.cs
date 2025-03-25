@@ -14,10 +14,8 @@ public class RoleController: ControllerBase {
     
     [HttpGet("List")]
     public async Task<PagedResult<RoleGetDto>> GetAllRolesAsync(CancellationToken cancellationToken, 
-        [FromQuery] IEnumerable<bool>? status = null,
-        [FromQuery] int skip = 0, 
-        [FromQuery] int take = 10) {
-        return await _roleService.GetAllRolesAsync(status, skip, take, cancellationToken);
+        [FromQuery] RoleFilterDto filter) {
+        return await _roleService.GetAllRolesAsync(filter, cancellationToken);
     }
     
     [HttpGet("ListWithoutSorting")]
@@ -47,8 +45,8 @@ public class RoleController: ControllerBase {
     
     [HttpGet("ListFunctions")]
     public async Task<IEnumerable<Function>> GetAllFunctionsAsync(CancellationToken cancellationToken,
-        [FromQuery] string? sort = "desc") {
-        return await _roleService.GetAllFunctionsAsync(sort, cancellationToken);
+        [FromQuery] FunctionFilterDto filter) {
+        return await _roleService.GetAllFunctionsAsync(filter, cancellationToken);
     }
 
 }

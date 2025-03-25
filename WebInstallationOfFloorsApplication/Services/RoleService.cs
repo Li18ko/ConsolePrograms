@@ -14,10 +14,9 @@ public class RoleService {
         _mapper = mapper;
     }
     
-    public async Task<PagedResult<RoleGetDto>> GetAllRolesAsync(IEnumerable<bool>? status, 
-        int skip, int take,CancellationToken cancellationToken) {
+    public async Task<PagedResult<RoleGetDto>> GetAllRolesAsync(RoleFilterDto filter,CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка ролей и функций");
-        var (roles, totalCount) = await _roleRepository.GetAllRolesAsync(status, skip, take, cancellationToken);
+        var (roles, totalCount) = await _roleRepository.GetAllRolesAsync(filter, cancellationToken);
         _logger.Debug($"Найдено ролей: {roles.Count()}");
         
         var rolesDto = roles.Select(role => _mapper.Map<RoleGetDto>(role)).ToList();
@@ -110,9 +109,9 @@ public class RoleService {
         logDebugActionSuccessful($"удален c id = {id}");
     }
     
-    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(string sort, CancellationToken cancellationToken) {
+    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(FunctionFilterDto filter, CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка функций");
-        var functions = await _roleRepository.GetAllFunctionsAsync(sort, cancellationToken);
+        var functions = await _roleRepository.GetAllFunctionsAsync(filter, cancellationToken);
         _logger.Debug($"Найдено функций: {functions.Count()}");
         
         return functions;
