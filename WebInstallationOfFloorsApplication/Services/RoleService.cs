@@ -110,9 +110,9 @@ public class RoleService {
         logDebugActionSuccessful($"удален c id = {id}");
     }
     
-    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(CancellationToken cancellationToken) {
+    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(string sort, CancellationToken cancellationToken) {
         logDebugRequestSuccessful("получение списка функций");
-        var functions = await _roleRepository.GetAllFunctionsAsync(cancellationToken);
+        var functions = await _roleRepository.GetAllFunctionsAsync(sort, cancellationToken);
         _logger.Debug($"Найдено функций: {functions.Count()}");
         
         return functions;

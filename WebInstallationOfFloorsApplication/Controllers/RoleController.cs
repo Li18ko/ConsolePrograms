@@ -46,8 +46,9 @@ public class RoleController: ControllerBase {
     }
     
     [HttpGet("ListFunctions")]
-    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(CancellationToken cancellationToken) {
-        return await _roleService.GetAllFunctionsAsync(cancellationToken);
+    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(CancellationToken cancellationToken,
+        [FromQuery] string? sort = "desc") {
+        return await _roleService.GetAllFunctionsAsync(sort, cancellationToken);
     }
 
 }

@@ -67,8 +67,13 @@ public class RoleRepository {
             .AnyAsync(ur => ur.RoleId == id, cancellationToken); 
     }
     
-    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(CancellationToken cancellationToken) {
-        return await _context.Function.ToListAsync(cancellationToken);
+    public async Task<IEnumerable<Function>> GetAllFunctionsAsync(string sort, CancellationToken cancellationToken) {
+        var functions = await _context.Function.ToListAsync(cancellationToken);
+
+        var sortedFunctions = sort == "asc"
+            ? functions.OrderBy(f => f.Order) 
+            : functions.OrderByDescending(f => f.Order); 
+
+        return sortedFunctions;
     }
-    
 }

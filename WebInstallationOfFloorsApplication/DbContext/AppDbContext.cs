@@ -38,23 +38,23 @@ public class AppDbContext: DbContext {
         );
 
         modelBuilder.Entity<Function>().HasData(
-            new Function { Id = 1, Code = "UserList", Name = "Чтение пользователей", Module = "Пользователи"},
-            new Function { Id = 2, Code = "User", Name = "Чтение пользователя", Module = "Пользователи"},
-            new Function { Id = 3, Code = "UserEdit", Name = "Редактирование пользователя", Module = "Пользователи"},
-            new Function { Id = 4, Code = "UserDelete", Name = "Удаление пользователя", Module = "Пользователи"},
-            new Function { Id = 5, Code = "UserAdd", Name = "Добавление пользователя", Module = "Пользователи"},
+            new Function { Id = 1, Code = "UserList", Name = "Чтение пользователей", Module = "Пользователи", Order = 1},
+            new Function { Id = 2, Code = "User", Name = "Чтение пользователя", Module = "Пользователи", Order = 2},
+            new Function { Id = 3, Code = "UserEdit", Name = "Редактирование пользователя", Module = "Пользователи", Order = 4},
+            new Function { Id = 4, Code = "UserDelete", Name = "Удаление пользователя", Module = "Пользователи", Order = 5},
+            new Function { Id = 5, Code = "UserAdd", Name = "Добавление пользователя", Module = "Пользователи", Order = 3},
             
-            new Function { Id = 6, Code = "TaskList", Name = "Чтение всех задач", Module = "Задачи"},
-            new Function { Id = 7, Code = "Task", Name = "Чтение задачи", Module = "Задачи"},
-            new Function { Id = 8, Code = "TaskEdit", Name = "Редактирование задачи", Module = "Задачи"},
-            new Function { Id = 9, Code = "TaskDelete", Name = "Удаление задачи", Module = "Задачи"},
-            new Function { Id = 10, Code = "TaskAdd", Name = "Добавление задачи", Module = "Задачи"},
+            new Function { Id = 6, Code = "TaskList", Name = "Чтение всех задач", Module = "Задачи", Order = 1},
+            new Function { Id = 7, Code = "Task", Name = "Чтение задачи", Module = "Задачи", Order = 2},
+            new Function { Id = 8, Code = "TaskEdit", Name = "Редактирование задачи", Module = "Задачи", Order = 4},
+            new Function { Id = 9, Code = "TaskDelete", Name = "Удаление задачи", Module = "Задачи", Order = 5},
+            new Function { Id = 10, Code = "TaskAdd", Name = "Добавление задачи", Module = "Задачи", Order = 3},
             
-            new Function { Id = 11, Code = "RoleList", Name = "Чтение ролей", Module = "Роли"},
-            new Function { Id = 12, Code = "Role", Name = "Чтение роли", Module = "Роли"},
-            new Function { Id = 13, Code = "RoleEdit", Name = "Редактирование роли", Module = "Роли"},
-            new Function { Id = 14, Code = "RoleDelete", Name = "Удаление роли", Module = "Роли"},
-            new Function { Id = 15, Code = "RoleAdd", Name = "Добавление роли", Module = "Роли"}
+            new Function { Id = 11, Code = "RoleList", Name = "Чтение ролей", Module = "Роли", Order = 1},
+            new Function { Id = 12, Code = "Role", Name = "Чтение роли", Module = "Роли", Order = 2},
+            new Function { Id = 13, Code = "RoleEdit", Name = "Редактирование роли", Module = "Роли", Order = 4},
+            new Function { Id = 14, Code = "RoleDelete", Name = "Удаление роли", Module = "Роли", Order = 5},
+            new Function { Id = 15, Code = "RoleAdd", Name = "Добавление роли", Module = "Роли", Order = 3}
         );
 
         modelBuilder.Entity<User>().HasData(
