@@ -1,7 +1,12 @@
+using System.Security.Claims;
+using System.Text;
 using Log;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using ILogger = Log.ILogger;
 
 namespace WebInstallationOfFloorsApplication {
@@ -51,6 +56,27 @@ namespace WebInstallationOfFloorsApplication {
                 throw new Exception("Url ngrok отсутствует в конфигурации!");
             }
             logger.Info("Url ngrok успешно загружен");
+
+            string secretKey = builder.Configuration["Jwt:SecretKey"];
+            if (string.IsNullOrEmpty(secretKey)) {
+                logger.Error("Не удалось загрузить secretKey");
+                throw new Exception("secretKey отсутствует в конфигурации!");
+            }
+            logger.Info("secretKey успешно загружен");
+            
+            string issuer = builder.Configuration["Jwt:Issuer"];
+            if (string.IsNullOrEmpty(issuer)) {
+                logger.Error("Не удалось загрузить issuer");
+                throw new Exception("issuer отсутствует в конфигурации!");
+            }
+            logger.Info("issuer успешно загружен");
+            
+            string audience = builder.Configuration["Jwt:Audience"];
+            if (string.IsNullOrEmpty(audience)) {
+                logger.Error("Не удалось загрузить audience");
+                throw new Exception("audience отсутствует в конфигурации!");
+            }
+            logger.Info("audience успешно загружен");
             
             builder.Services.AddScoped<TaskRepository>();
             builder.Services.AddScoped<TaskService>();
@@ -72,6 +98,28 @@ namespace WebInstallationOfFloorsApplication {
             
             builder.Services.AddSingleton<IHostedService, TelegramBackgroundService>();
             
+            builder.Services.AddScoped<AccountService>();
+            
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options => {
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = issuer,  
+                        ValidAudience = audience, 
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                        RoleClaimType = ClaimTypes.Role
+                    };
+                });
+            
+            builder.Services.AddScoped<TokenService>(sp => {
+                return new TokenService(secretKey, issuer, audience);
+            });
+            
             builder.Services.AddControllers();
             
             builder.Services.AddCors(options => {
@@ -86,8 +134,31 @@ namespace WebInstallationOfFloorsApplication {
             });
             
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            logger.Info("Сервисы приложения успешно зарегистрированы    ");
+            
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebInstallationOfFloorsApplication API", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+                    Description = "Введите токен access:",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer"
+                });
+                
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement { {
+                        new OpenApiSecurityScheme {
+                            Reference = new OpenApiReference {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
+                
+            });
+            logger.Info("Сервисы приложения успешно зарегистрированы ");
             
             var app = builder.Build();
             
@@ -103,7 +174,7 @@ namespace WebInstallationOfFloorsApplication {
                     dbContext.Database.Migrate();
                 }
             }
-
+            app.UseCors("AllowAll");
             
             if (app.Environment.IsDevelopment()) {
                 app.UseSwagger();
@@ -111,14 +182,14 @@ namespace WebInstallationOfFloorsApplication {
                 logger.Info("Приложение работает в режиме разработки (Development)");
             }
             
-            app.UseMiddleware<ErrorHandlingMiddleware>(logger);
-            app.UseCors("AllowAll");
+            app.UseAuthentication();
             app.UseAuthorization();
-            app.UseHttpsRedirection();
-            app.MapControllers();
-
             
+            app.UseMiddleware<ErrorHandlingMiddleware>(logger);
+            
+            app.MapControllers();
             logger.Info("Приложение запущено и готово принимать запросы");
+
             app.Run();
             
         }

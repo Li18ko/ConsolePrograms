@@ -17,8 +17,8 @@ public class UserRepository {
             .ThenInclude(ur => ur.Role)
             .AsQueryable();
         
-        if (filter.Filter != null && filter.Filter.Any()) {
-            query = query.Where(u => u.UserRoles.Any(ur => filter.Filter.Contains(ur.Role.Id)));
+        if (filter.Role != null && filter.Role.Any()) {
+            query = query.Where(u => u.UserRoles.Any(ur => filter.Role.Contains(ur.Role.Id)));
         }
         
         if (!string.IsNullOrEmpty(filter.Search)) {
@@ -80,6 +80,56 @@ public class UserRepository {
             .Where(u => u.Id == id)
             .Select(u => u.Password)
             .FirstOrDefaultAsync(cancellationToken);
+    }
+    
+    public async Task<User> GetUserByLoginAsync(string login, CancellationToken cancellationToken) {
+        return await _context.User
+            .FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
+    }
+    
+    public async Task<IEnumerable<string>> GetUserPermissionsAsync(int userId, CancellationToken cancellationToken) {
+        return await _context.RoleFunction
+            .Where(rf => _context.UserRole
+                .Where(ur => ur.UserId == userId)
+                .Select(ur => ur.RoleId)
+                .Contains(rf.RoleId))
+            .Select(rf => rf.Function.Code) 
+            .Distinct()
+            .ToListAsync(cancellationToken);
+    }
+    
+    public async Task<IEnumerable<string>> GetUserRolesAsync(int userId, CancellationToken cancellationToken) {
+        return await _context.UserRole
+            .Where(ur => ur.UserId == userId)
+            .Select(ur => ur.Role.Name)
+            .Distinct()
+            .ToListAsync(cancellationToken);
+    }
+    
+    public async System.Threading.Tasks.Task SaveRefreshTokenAsync(User user, string refreshToken, CancellationToken cancellationToken) {
+        var newToken = new RefreshToken {
+            Token = refreshToken,
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            UserId = user.Id
+        };
+        
+        _context.RefreshToken.Add(newToken);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+    
+    public async Task<User?> GetUserByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken) {
+        return await _context.User
+            .Include(u => u.RefreshTokens)
+            .FirstOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == refreshToken 
+                                                               && !t.IsRevoked), cancellationToken);
+    }
+    
+    public async System.Threading.Tasks.Task RevokeRefreshTokensAsync(User user, CancellationToken cancellationToken) {
+        var tokens = _context.RefreshToken.Where(t => t.UserId == user.Id);
+        foreach (var token in tokens) {
+            token.IsRevoked = true;  
+        }
+        await _context.SaveChangesAsync(cancellationToken);
     }
     
     public async Task<int?> InsertUserAsync(User? user, CancellationToken cancellationToken) {

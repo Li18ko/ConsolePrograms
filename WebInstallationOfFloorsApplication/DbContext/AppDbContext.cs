@@ -12,6 +12,7 @@ public class AppDbContext: DbContext {
     public DbSet<UserRole> UserRole { get; set; }
     public DbSet<Function> Function { get; set; }
     public DbSet<RoleFunction> RoleFunction { get; set; }
+    public DbSet<RefreshToken> RefreshToken { get; set; }
     
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) {
     }
@@ -187,6 +188,12 @@ public class AppDbContext: DbContext {
                 };
             }).ToArray()
         );
+        
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany(u => u.RefreshTokens)
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
 }

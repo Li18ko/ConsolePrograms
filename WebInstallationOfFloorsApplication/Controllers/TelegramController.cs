@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebInstallationOfFloorsApplication;
@@ -12,11 +13,13 @@ public class TelegramController: ControllerBase {
         _telegramService = telegramService;
     }
 
+    [Authorize(Roles = "Admin,Manager")]
     [HttpPost("sendMessage")]
     public async System.Threading.Tasks.Task SendMessageAsync(CancellationToken cancellationToken) {
         await _telegramService.SendDailyMessagesAsync(cancellationToken);
     }
 
+    [AllowAnonymous]
     [HttpPost("webhook")]
     public async System.Threading.Tasks.Task HandleWebhookAsync([FromBody] CallbackQueryDto callbackQueryDto, 
         CancellationToken cancellationToken) {

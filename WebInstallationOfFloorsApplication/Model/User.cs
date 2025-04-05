@@ -10,4 +10,6 @@ public class User {
     public DateTimeOffset CreatedAt {get;set;}
     public DateTimeOffset LastRevision {get;set;}
     public ICollection<UserRole> UserRoles { get; set; }
+    public ICollection<RefreshToken> RefreshTokens { get; set; }
+
 }
